@@ -1,17 +1,17 @@
-"use client";
-
 import Link from "next/link";
 import SubFooter from "./subFooter";
 
-const FooterComponent = () => {
+const Footer = () => {
   return (
     <>
-      <footer className="border voluntary-t mt-5 pt-5 bg-gray-100">
+      <footer className="border-t pt-2 bg-gray-100 dark:bg-gray-900 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 py-6 gap-12">
             <div className="space-y-3">
-              <h2 className="font-bold uppercase text-sm">Giới thiệu</h2>
-              <ul className="text-sm space-y-3">
+              <h2 className="font-bold uppercase text-sm text-gray-800 dark:text-gray-200">
+                Giới thiệu
+              </h2>
+              <ul className="text-sm space-y-3 text-gray-600 dark:text-gray-400">
                 {[
                   "Phương thức hoạt động của Airbnb",
                   "Trang tin tức",
@@ -39,8 +39,10 @@ const FooterComponent = () => {
             </div>
 
             <div className="space-y-3">
-              <h2 className="font-bold uppercase text-sm">Cộng đồng</h2>
-              <ul className="text-sm space-y-3">
+              <h2 className="font-bold uppercase text-sm text-gray-800 dark:text-gray-200">
+                Cộng đồng
+              </h2>
+              <ul className="text-sm space-y-3 text-gray-600 dark:text-gray-400">
                 {[
                   "Sự đa dạng và Cảm giác thân thuộc",
                   "Tiện nghi phù hợp cho người khuyết tật",
@@ -64,8 +66,10 @@ const FooterComponent = () => {
             </div>
 
             <div className="space-y-3">
-              <h2 className="font-bold uppercase text-sm">Đón tiếp khách</h2>
-              <ul className="text-sm space-y-3">
+              <h2 className="font-bold uppercase text-sm text-gray-800 dark:text-gray-200">
+                Đón tiếp khách
+              </h2>
+              <ul className="text-sm space-y-3 text-gray-600 dark:text-gray-400">
                 {[
                   "Cho thuê nhà",
                   "Tổ chức trải nghiệm trực tuyến",
@@ -89,8 +93,10 @@ const FooterComponent = () => {
             </div>
 
             <div className="space-y-3">
-              <h2 className="font-bold uppercase text-sm">Hỗ trợ</h2>
-              <ul className="text-sm space-y-3">
+              <h2 className="font-bold uppercase text-sm text-gray-800 dark:text-gray-200">
+                Hỗ trợ
+              </h2>
+              <ul className="text-sm space-y-3 text-gray-600 dark:text-gray-400">
                 {[
                   "Biện pháp ứng phó với đại dịch COVID-19",
                   "Trung tâm trợ giúp",
@@ -119,4 +125,4 @@ const FooterComponent = () => {
   );
 };
 
-export default FooterComponent;
+export default Footer;

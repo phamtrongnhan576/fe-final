@@ -1,34 +1,22 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Menu from "./MenuHeader";
+import MobileMenu from "./MobileMenu";
+import { useHeaderScroll } from "../hooks/useHeaderScroll";
 
 const Header = () => {
-  const [visible, setVisible] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [scrollDirection, setScrollDirection] = useState<"up" | "down">("up");
-
-  const pathname = usePathname();
-
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setIsScrolled(currentScrollY > 50);
-      setScrollDirection(currentScrollY > lastScrollY.current ? "down" : "up");
-      lastScrollY.current = currentScrollY;
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const {
+    visible,
+    setVisible,
+    isScrolled,
+    dropdownOpen,
+    setDropdownOpen,
+    scrollDirection,
+    pathname,
+  } = useHeaderScroll();
 
   const navItems = [
     { key: "home", label: "Home", href: "/" },
@@ -53,7 +41,7 @@ const Header = () => {
         duration: 0.4,
       }}
       className={`z-50 fixed w-full backdrop-blur-md bg-white/70 dark:bg-gray-900/70 transition-all duration-500 ${
-        isScrolled ? "shadow-md dark:shadow-gray-800" : ""
+        isScrolled ? "shadow-md dark:shadow-black" : ""
       }`}
     >
       <div
@@ -95,49 +83,12 @@ const Header = () => {
         />
       </div>
 
-      <AnimatePresence>
-        {visible && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 overflow-hidden"
-          >
-            <ul className="flex flex-col gap-4 p-6">
-              {navItems.map((item) => (
-                <li key={item.key}>
-                  <Link
-                    href={item.href}
-                    className={`block font-medium transition-colors duration-200 ${
-                      pathname === item.href
-                        ? "text-rose-500"
-                        : "text-gray-600 dark:text-gray-300 hover:text-rose-500"
-                    }`}
-                    onClick={() => setVisible(false)}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            <div className="border-t p-4">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-black">
-                    <User
-                      className="text-white"
-                      style={{ width: "25px", height: "25px" }}
-                    />
-                  </AvatarFallback>
-                </Avatar>
-                <span className="font-medium dark:text-gray-300">minh</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MobileMenu
+        visible={visible}
+        setVisible={setVisible}
+        pathname={pathname}
+        navItems={navItems}
+      />
     </motion.nav>
   );
 };

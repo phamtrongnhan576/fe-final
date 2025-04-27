@@ -10,7 +10,10 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1 bg-white p-6" style={{ minHeight: "2000px" }}>
+      <main
+        className="flex-1 bg-white dark:bg-gray-900 p-6"
+        style={{ minHeight: "2000px" }}
+      >
         {children}
       </main>
       <Footer />

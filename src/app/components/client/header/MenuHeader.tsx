@@ -76,9 +76,9 @@ const MenuHeader = ({
               className="flex items-center gap-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
             >
               <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-black">
+                <AvatarFallback className="bg-black dark:bg-gray-300">
                   <User
-                    className="text-white"
+                    className="text-white dark:text-gray-700"
                     style={{ width: "25px", height: "25px" }}
                   />
                 </AvatarFallback>

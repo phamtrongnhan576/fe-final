@@ -36,7 +36,12 @@ const SubFooter = () => {
         ${isAtBottom ? "relative" : "sticky bottom-0"} 
         w-full
         shadow-2xl
-        px-10 justify-between items-center text-gray-500 border-t border-gray-200 py-4 bg-white hidden lg:flex
+        px-10 justify-between items-center
+        text-gray-500 dark:text-gray-400
+        border-t border-gray-200 dark:border-gray-700
+        py-4
+        bg-white dark:bg-gray-900
+        hidden lg:flex
       `}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -72,7 +77,7 @@ const SubFooter = () => {
         </Link>
         .
       </div>
-      <div className="text-gray-800 flex items-center space-x-3">
+      <div className="text-gray-800 dark:text-gray-400 flex items-center space-x-3">
         <span>
           <Globe className="inline-block h-4 w-4" />
         </span>
