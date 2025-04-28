@@ -2,26 +2,15 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
-
-type NavItem = {
-  key: string;
-  label: string;
-  href: string;
-};
+import { navItems } from "@/app/lib/client/data/navItems";
 
 type MobileMenuProps = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   pathname: string;
-  navItems: NavItem[];
 };
 
-const MobileMenu = ({
-  visible,
-  setVisible,
-  pathname,
-  navItems,
-}: MobileMenuProps) => {
+const MobileMenu = ({ visible, setVisible, pathname }: MobileMenuProps) => {
   return (
     <AnimatePresence>
       {visible && (

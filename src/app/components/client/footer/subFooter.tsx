@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 const SubFooter = () => {
   const { scrollY } = useScroll();
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const y = useTransform(scrollY, [0, 300], isAtBottom ? [0, 0] : [0, -10]);
   const scale = useTransform(
@@ -15,6 +16,10 @@ const SubFooter = () => {
     [0, 300],
     isAtBottom ? [1, 1] : [1, 0.98]
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +33,8 @@ const SubFooter = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (!mounted) return null;
 
   return (
     <motion.div

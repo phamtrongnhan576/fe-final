@@ -9,21 +9,30 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, Moon, Sun, User, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+type MenuHeaderProps = {
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
+  dropdownOpen: boolean;
+  setDropdownOpen: (dropdownOpen: boolean) => void;
+  isScrolled: boolean;
+};
 
 const MenuHeader = ({
   visible,
   setVisible,
   dropdownOpen,
   setDropdownOpen,
-}: {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  dropdownOpen: boolean;
-  setDropdownOpen: (dropdownOpen: boolean) => void;
-}) => {
+  isScrolled,
+}: MenuHeaderProps) => {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -34,6 +43,7 @@ const MenuHeader = ({
         setDropdownOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("touchstart", handleClickOutside);
     return () => {
@@ -42,18 +52,32 @@ const MenuHeader = ({
     };
   }, [setDropdownOpen]);
 
+  if (!mounted) return null;
+
   return (
     <div className="flex items-center gap-3">
       <Button
         variant="ghost"
         size="icon"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="inline-flex p-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-200"
+        className="inline-flex p-2 text-gray-700 dark:text-gray-300 hover:bg-transparent dark:hover:bg-transparent cursor-pointer rounded-lg transition-colors duration-200"
       >
         {theme === "dark" ? (
-          <Sun className="h-6 w-6" />
+          <Sun
+            className={`h-6 w-6 hover:none ${
+              isScrolled
+                ? "text-gray-600 dark:text-white"
+                : "text-white dark:text-white"
+            }`}
+          />
         ) : (
-          <Moon className="h-6 w-6" />
+          <Moon
+            className={`h-6 w-6 hover:none ${
+              isScrolled
+                ? "text-gray-600 dark:text-white"
+                : "text-white dark:text-white"
+            }`}
+          />
         )}
       </Button>
 
@@ -62,7 +86,11 @@ const MenuHeader = ({
           variant="ghost"
           size="icon"
           onClick={() => setVisible(!visible)}
-          className="p-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors duration-200"
+          className={`p-2 rounded-lg hover:bg-transparent hover:text-white dark:hover:bg-transparent cursor-pointer ${
+            isScrolled
+              ? "text-gray-600 dark:text-white"
+              : "text-white dark:text-white"
+          }`}
         >
           {visible ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
@@ -73,7 +101,7 @@ const MenuHeader = ({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+              className="flex items-center gap-3 p-2 rounded-full hover:bg-transparent dark:hover:bg-transparent transition-colors duration-200 cursor-pointer dark:cursor-pointer"
             >
               <Avatar className="h-12 w-12">
                 <AvatarFallback className="bg-black dark:bg-gray-300">
@@ -83,7 +111,13 @@ const MenuHeader = ({
                   />
                 </AvatarFallback>
               </Avatar>
-              <span className="uppercase font-semibold text-sm dark:text-gray-300">
+              <span
+                className={`uppercase font-semibold text-sm ${
+                  isScrolled
+                    ? "text-gray-600 dark:text-white"
+                    : "text-white dark:text-white"
+                }`}
+              >
                 minh
               </span>
             </Button>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Menu from "./MenuHeader";
 import MobileMenu from "./MobileMenu";
 import { useHeaderScroll } from "../hooks/useHeaderScroll";
+import { navItems } from "@/app/lib/client/data/navItems";
 
 const Header = () => {
   const {
@@ -17,14 +18,6 @@ const Header = () => {
     scrollDirection,
     pathname,
   } = useHeaderScroll();
-
-  const navItems = [
-    { key: "home", label: "Home", href: "/" },
-    { key: "about", label: "About", href: "/about" },
-    { key: "services", label: "Services", href: "/services" },
-    { key: "pricing", label: "Pricing", href: "/pricing" },
-    { key: "contact", label: "Contact", href: "/contact" },
-  ];
 
   return (
     <motion.nav
@@ -40,18 +33,20 @@ const Header = () => {
         damping: 20,
         duration: 0.4,
       }}
-      className={`z-50 fixed w-full backdrop-blur-md bg-white/70 dark:bg-gray-900/70 transition-all duration-500 ${
-        isScrolled ? "shadow-md dark:shadow-black" : ""
+      className={`z-50 fixed w-full bg-transparent transition-all duration-500 ${
+        isScrolled
+          ? "shadow-md bg-white dark:shadow-black dark:bg-gray-900"
+          : ""
       }`}
     >
       <div
         className={`relative max-w-7xl mx-auto flex items-center justify-between px-6 ${
-          isScrolled ? "py-2" : "py-4"
+          isScrolled ? "py-4" : "py-6"
         } transition-all duration-300`}
       >
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/logo.svg" alt="Logo" width={40} height={40} />
-          <span className="text-2xl font-extrabold text-rose-500 tracking-tight hover:text-rose-600 transition-colors duration-200">
+          <Image src="/airbnb-1.svg" alt="Logo" width={40} height={40} />
+          <span className="text-2xl font-extrabold text-custom-rose tracking-tight">
             airbnb
           </span>
         </Link>
@@ -64,8 +59,10 @@ const Header = () => {
                   href={item.href}
                   className={`transition-colors duration-200 ${
                     pathname === item.href
-                      ? "text-rose-500"
-                      : "text-gray-600 dark:text-gray-300 hover:text-rose-500"
+                      ? "text-custom-rose"
+                      : `dark:text-gray-300 dark:hover:text-custom-rose hover:text-custom-rose ${
+                          isScrolled ? "text-gray-600 dark:text-white" : "text-white dark:text-white"
+                        }`
                   }`}
                 >
                   {item.label}
@@ -80,6 +77,7 @@ const Header = () => {
           visible={visible}
           setDropdownOpen={setDropdownOpen}
           dropdownOpen={dropdownOpen}
+          isScrolled={isScrolled}
         />
       </div>
 
@@ -87,7 +85,6 @@ const Header = () => {
         visible={visible}
         setVisible={setVisible}
         pathname={pathname}
-        navItems={navItems}
       />
     </motion.nav>
   );

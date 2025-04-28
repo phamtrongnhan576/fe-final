@@ -12,7 +12,7 @@ export const useHeaderScroll = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setIsScrolled(currentScrollY > 50);
+      setIsScrolled(currentScrollY > 200);
       setScrollDirection(currentScrollY > lastScrollY.current ? "down" : "up");
       lastScrollY.current = currentScrollY;
     };
