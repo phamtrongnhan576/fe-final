@@ -1,6 +1,6 @@
+import Footer from "@/components/client/footer";
+import Header from "@/components/client/header";
 import { type ReactNode } from "react";
-import Header from "@/app/components/client/header";
-import Footer from "@/app/components/client/footer";
 
 interface HomeLayoutProps {
   children: ReactNode;

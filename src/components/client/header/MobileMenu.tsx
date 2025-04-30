@@ -2,7 +2,8 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
-import { navItems } from "@/app/lib/client/data/navItems";
+import { navItems } from "@/lib/client/data/navItems";
+
 
 type MobileMenuProps = {
   visible: boolean;
