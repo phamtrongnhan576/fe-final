@@ -1,20 +1,26 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-export const useHeaderScroll = () => {
-  const [visible, setVisible] = useState(false);
+export const useHeaderScroll = (): {
+  isScrolled: boolean;
+  isMounted: boolean;
+  pathname: string;
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
+} => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [scrollDirection, setScrollDirection] = useState<"up" | "down">("up");
   const pathname = usePathname();
-  const lastScrollY = useRef(0);
+  const [visible, setVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setIsScrolled(currentScrollY > 200);
-      setScrollDirection(currentScrollY > lastScrollY.current ? "down" : "up");
-      lastScrollY.current = currentScrollY;
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop >= 100);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -22,12 +28,10 @@ export const useHeaderScroll = () => {
   }, []);
 
   return {
+    isScrolled,
+    isMounted,
+    pathname,
     visible,
     setVisible,
-    isScrolled,
-    dropdownOpen,
-    setDropdownOpen,
-    scrollDirection,
-    pathname,
   };
 };

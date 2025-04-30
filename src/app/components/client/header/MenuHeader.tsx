@@ -1,4 +1,5 @@
 "use client";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,77 +8,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, Moon, Sun, User, X } from "lucide-react";
-import { useTheme } from "next-themes";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useMenuDropdown } from "../hooks/useMenuDropdown";
 
 type MenuHeaderProps = {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  dropdownOpen: boolean;
-  setDropdownOpen: (dropdownOpen: boolean) => void;
-  isScrolled: boolean;
 };
 
-const MenuHeader = ({
-  visible,
-  setVisible,
-  dropdownOpen,
-  setDropdownOpen,
-  isScrolled,
-}: MenuHeaderProps) => {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [setDropdownOpen]);
-
-  if (!mounted) return null;
+const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
+  const { theme, setTheme, dropdownOpen, setDropdownOpen, dropdownRef } =
+    useMenuDropdown();
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-1 md:gap-3">
       <Button
         variant="ghost"
         size="icon"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="inline-flex p-2 text-gray-700 dark:text-gray-300 hover:bg-transparent dark:hover:bg-transparent cursor-pointer rounded-lg transition-colors duration-200"
+        className="text-gray-700 dark:text-gray-300 hover:bg-transparent dark:hover:bg-transparent cursor-pointer"
       >
         {theme === "dark" ? (
-          <Sun
-            className={`h-6 w-6 hover:none ${
-              isScrolled
-                ? "text-gray-600 dark:text-white"
-                : "text-white dark:text-white"
-            }`}
-          />
+          <Sun className="!h-4 md:!h-6 !w-4 md:!w-6 hover:none text-white dark:text-white" />
         ) : (
-          <Moon
-            className={`h-6 w-6 hover:none ${
-              isScrolled
-                ? "text-gray-600 dark:text-white"
-                : "text-white dark:text-white"
-            }`}
-          />
+          <Moon className="!h-4 md:!h-6 !w-4 md:!w-6 hover:none text-white dark:text-white" />
         )}
       </Button>
 
@@ -86,32 +40,32 @@ const MenuHeader = ({
           variant="ghost"
           size="icon"
           onClick={() => setVisible(!visible)}
-          className={`p-2 rounded-lg hover:bg-transparent hover:text-white dark:hover:bg-transparent cursor-pointer ${
-            isScrolled
-              ? "text-gray-600 dark:text-white"
-              : "text-white dark:text-white"
-          }`}
+          className="hover:bg-transparent hover:text-white dark:hover:bg-transparent cursor-pointer text-white dark:text-white"
         >
-          {visible ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {visible ? (
+            <X className="!h-5 !w-5" />
+          ) : (
+            <Menu className="!h-5 !w-5" />
+          )}
         </Button>
       </div>
 
-      <div className="hidden md:flex gap-3 items-center" ref={dropdownRef}>
+      <div className="hidden md:flex relative" ref={dropdownRef}>
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-3 p-2 rounded-full hover:bg-transparent dark:hover:bg-transparent transition-colors duration-200 cursor-pointer dark:cursor-pointer"
+              className="flex rounded-full hover:bg-transparent dark:hover:bg-transparent cursor-pointer dark:cursor-pointer"
             >
               <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-black dark:bg-gray-300">
+                <AvatarFallback className="bg-black border-3 border-custom-rose">
                   <User
-                    className="text-white dark:text-gray-700"
+                    className="text-white"
                     style={{ width: "25px", height: "25px" }}
                   />
                 </AvatarFallback>
               </Avatar>
-              <span
+              {/* <span
                 className={`uppercase font-semibold text-sm ${
                   isScrolled
                     ? "text-gray-600 dark:text-white"
@@ -119,7 +73,7 @@ const MenuHeader = ({
                 }`}
               >
                 minh
-              </span>
+              </span> */}
             </Button>
           </DropdownMenuTrigger>
           <AnimatePresence>
@@ -129,27 +83,27 @@ const MenuHeader = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-[calc(100%+8px)] right-0 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-2 z-50"
+                className="absolute top-[calc(100%+20px)] right-0 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-2"
               >
                 <Link
-                  href="/info-user"
-                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                  href="/"
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/"
-                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
                 >
                   Settings
                 </Link>
                 <Link
                   href="/"
-                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
                 >
                   Earnings
                 </Link>
-                <button className="block w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                <button className="flex w-full px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer">
                   Sign out
                 </button>
               </motion.div>
