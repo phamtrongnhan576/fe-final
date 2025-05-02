@@ -2,8 +2,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
-import { navItems } from "@/lib/client/data/navItems";
-
+import { navItems } from "@/lib/client/types/navItems";
 
 type MobileMenuProps = {
   visible: boolean;
@@ -20,7 +19,7 @@ const MobileMenu = ({ visible, setVisible, pathname }: MobileMenuProps) => {
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="block md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 overflow-hidden"
+          className="block overflow-hidden border-t border-gray-200 bg-white md:hidden dark:border-gray-700 dark:bg-gray-900"
         >
           <ul className="flex flex-col gap-4 p-6">
             {navItems.map((item) => (
@@ -30,7 +29,7 @@ const MobileMenu = ({ visible, setVisible, pathname }: MobileMenuProps) => {
                   className={`font-medium transition-colors duration-200 ${
                     pathname === item.href
                       ? "text-custom-rose"
-                      : "text-gray-600 dark:text-gray-300 hover:text-custom-rose dark:hover:text-custom-rose"
+                      : "hover:text-custom-rose dark:hover:text-custom-rose text-gray-600 dark:text-gray-300"
                   }`}
                   onClick={() => setVisible(false)}
                 >
@@ -43,7 +42,7 @@ const MobileMenu = ({ visible, setVisible, pathname }: MobileMenuProps) => {
           <div className="border-t p-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-black border-3 border-custom-rose">
+                <AvatarFallback className="border-custom-rose border-3 bg-black">
                   <User
                     className="text-white"
                     style={{ width: "25px", height: "25px" }}

@@ -6,8 +6,7 @@ import { motion } from "framer-motion";
 import Menu from "./MenuHeader";
 import MobileMenu from "./MobileMenu";
 import { useHeaderScroll } from "../hooks/useHeaderScroll";
-import { navItems } from "@/lib/client/data/navItems";
-
+import { navItems } from "@/lib/client/types/navItems";
 
 const Header = () => {
   const { isScrolled, isMounted, pathname, visible, setVisible } =
@@ -29,12 +28,12 @@ const Header = () => {
         damping: 10,
         mass: 0.8,
       }}
-      className="z-50 fixed w-full bg-transparent"
+      className="fixed z-50 w-full bg-transparent"
     >
       <div className="relative container mx-auto flex items-center justify-between p-6">
         <Link href="/" className="flex items-center gap-3">
           <Image src="/airbnb-1.svg" alt="Logo" width={40} height={40} />
-          <span className="text-2xl font-extrabold text-custom-rose tracking-tight">
+          <span className="text-custom-rose text-2xl font-extrabold tracking-tight">
             airbnb
           </span>
         </Link>

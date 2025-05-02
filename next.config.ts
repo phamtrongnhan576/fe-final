@@ -9,6 +9,22 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "airbnbnew.cybersoft.edu.vn",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "s1.media.ngoisao.vn",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
