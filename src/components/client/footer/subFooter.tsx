@@ -16,7 +16,7 @@ const SubFooter = () => {
       style={{ y, scale }}
       className={`
         ${
-          isAtBottom ? "relative" : "sticky bottom-0"
+          isAtBottom ? "relative" : "sticky bottom-0 z-20"
         } w-full shadow-2xl dark:shadow-black px-10 justify-between items-center text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-white py-4 bg-white dark:bg-gray-900 hidden lg:flex`}
     >
       <div>

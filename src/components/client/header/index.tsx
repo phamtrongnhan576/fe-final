@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import Menu from "./MenuHeader";
 import MobileMenu from "./MobileMenu";
 import { useHeaderScroll } from "../hooks/useHeaderScroll";
-import { navItems } from "@/lib/client/types/navItems";
+import { navItems } from "@/lib/client/types/dataTypes";
 
 const Header = () => {
   const { isScrolled, isMounted, pathname, visible, setVisible } =

@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { QueryClientWrapper } from "@/lib/client/providers";
+import AOSProvider from "@/lib/client/providers/AOSProvider";
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["300", "400", "700"] });
 
@@ -20,7 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className}`} suppressHydrationWarning>
-        <QueryClientWrapper>
+        <AOSProvider>
+          <QueryClientWrapper>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -31,6 +33,7 @@ export default function RootLayout({
             <Toaster />
           </ThemeProvider>
         </QueryClientWrapper>
+        </AOSProvider>
       </body>
     </html>
   );

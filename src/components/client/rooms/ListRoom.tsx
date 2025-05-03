@@ -83,11 +83,6 @@ const concatDevice = (mayGiat: boolean, banLa: boolean, tivi: boolean, dieuHoa: 
 }
 
 export default function ListRoom({ rooms, position }: { rooms: Room[]; position: Position }) {
-
-  console.log("position: ", position);
-
-
-
   return (
     <div className="mx-auto container grid grid-cols-1 lg:grid-cols-2 gap-3">
       {/* Left Section: Room Listings */}
