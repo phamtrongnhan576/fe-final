@@ -13,13 +13,13 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "airbnbnew.cybersoft.edu.vn",
+        hostname: "**",
         port: "",
         pathname: "/**",
       },
       {
-        protocol: "https",
-        hostname: "s1.media.ngoisao.vn",
+        protocol: "http",
+        hostname: "**",
         port: "",
         pathname: "/**",
       },

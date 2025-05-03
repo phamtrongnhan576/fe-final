@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Search, User, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, slugify } from "@/lib/utils";
 import { Position } from "@/lib/client/types/types";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -14,9 +14,7 @@ import {
 import { searchSchema } from "@/lib/client/validator/validatior";
 import { LocationDialog, CheckInDialog, CheckOutDialog, GuestDialog } from "./searchDialog";
 import { toast } from "sonner"
-
-
-
+import { useRouter } from "next/navigation";
 
 interface SearchPanelClientProps {
   positions: Position[];
@@ -28,6 +26,7 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
   const [showLocationModal, setShowLocationModal] = useState<boolean>(false);
   const [showCheckInModal, setShowCheckInModal] = useState<boolean>(false);
   const [showCheckOutModal, setShowCheckOutModal] = useState<boolean>(false);
+  const router = useRouter();
 
   // Khởi tạo form
   const form = useForm<z.infer<typeof searchSchema>>({
@@ -40,8 +39,18 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
     },
   });
 
-  const handleSearch = (data: z.infer<typeof searchSchema>) => {
-    console.log("Searching for:", data);
+  const handleSearch = async (data: z.infer<typeof searchSchema>) => {
+    const selectedPosition = positions.find(pos => pos.tenViTri === data.location);
+    if (!selectedPosition) {
+      toast.error("Không tìm thấy vị trí đã chọn", {
+        duration: 2000,
+        className: "!bg-red-50 !text-red-600 !font-bold !border-[3px] !text-lg !border-red-500",
+        position: "top-right",
+      });
+      return;
+    }
+    const slug = slugify(selectedPosition.tinhThanh);
+    router.push(`/rooms/${slug}`);
   };
 
   const handleInvalid = () => {

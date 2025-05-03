@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useFooterScroll } from "../hooks/useFooterScroll";
 
+
 const SubFooter = () => {
   const { isAtBottom, y, scale, mounted } = useFooterScroll();
 
