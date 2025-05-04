@@ -1,5 +1,5 @@
 import axiosInstance from "./api";
-import { Position, Room } from "../types/types";
+import { Comment, defaultRoom, Position, Room } from "../types/types";
 
 export async function fetchPosition(): Promise<Position[]> {
   try {
@@ -28,6 +28,28 @@ export async function getRoomsByPosition(maViTri: string): Promise<Room[]> {
     const response = await axiosInstance.get(`/api/phong-thue/lay-phong-theo-vi-tri?maViTri=${maViTri}`);
 
     return Array.isArray(response.data.content) ? response.data.content : [];
+  } catch (error) {
+    console.error("Error fetching positions:", error);
+    return [];
+  }
+}
+
+export async function getRoomsById(id: string): Promise<Room> {
+  try {
+    const response = await axiosInstance.get(`/api/phong-thue/${id}`);
+
+    return response.data.content instanceof Object ? response.data.content : defaultRoom;
+  } catch (error) {
+    console.error("Error fetching positions:", error);
+    return defaultRoom;
+  }
+}
+
+export async function getCommentsById(id: string): Promise<Comment[]> {
+  try {
+    const response = await axiosInstance.get(`/api/binh-luan/lay-binh-luan-theo-phong/${id}`);
+
+    return response.data.content instanceof Array ? response.data.content : [];
   } catch (error) {
     console.error("Error fetching positions:", error);
     return [];

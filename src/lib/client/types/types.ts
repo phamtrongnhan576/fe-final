@@ -27,3 +27,34 @@ export interface Room {
   maViTri: number;
   hinhAnh: string;
 };
+
+export const defaultRoom: Room = {
+  id: 0,
+  tenPhong: '',
+  khach: 0,
+  phongNgu: 0,
+  giuong: 0,
+  phongTam: 0,
+  moTa: '',
+  giaTien: 0,
+  mayGiat: false,
+  banLa: false,
+  tivi: false,
+  dieuHoa: false,
+  wifi: false,
+  bep: false,
+  doXe: false,
+  hoBoi: false,
+  banUi: false,
+  maViTri: 0,
+  hinhAnh: '',
+};
+
+export interface Comment {
+  id: number;
+  ngayBinhLuan: Date;
+  noiDung: string;
+  saoBinhLuan: number;
+  tenNguoiBinhLuan: string;
+  avatar: string;
+}
