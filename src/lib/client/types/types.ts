@@ -58,3 +58,4 @@ export interface Comment {
   tenNguoiBinhLuan: string;
   avatar: string;
 }
+

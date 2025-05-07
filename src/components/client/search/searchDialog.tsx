@@ -3,7 +3,7 @@ import { Position } from "@/lib/client/types/types";
 import { searchSchema } from "@/lib/client/validator/validatior";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X, Calendar as CalendarIcon } from "lucide-react";
@@ -37,14 +37,16 @@ export const LocationDialog = ({
           <DialogTitle className="text-2xl font-bold">
             Bạn muốn đi đâu?
           </DialogTitle>
+          <DialogDescription className="text-gray-500 dark:text-white">
+            Vui lòng chọn địa điểm bạn muốn đi
+          </DialogDescription>
         </DialogHeader>
-        <div className="py-4 relative">
+        <div className="relative">
           <FormField
             control={form.control}
             name="location"
             render={({ field }) => (
               <FormItem className="m-0">
-                <FormLabel>Địa điểm</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -151,8 +153,8 @@ export const DatePickerDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-lg border-0 p-0 shadow-xl md:max-w-[380px]">
-        <DialogHeader className="px-6 pt-6 pb-2">
+      <DialogContent className="rounded-lg border-0 p-6 shadow-xl md:max-w-[380px]">
+        <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-white">
             {title}
           </DialogTitle>
@@ -161,81 +163,69 @@ export const DatePickerDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-6 pb-6">
-          <FormField
-            control={form.control}
-            name={fieldName}
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full cursor-pointer justify-start rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50"
-                      >
-                        <CalendarIcon className="mr-3 h-5 w-5 text-gray-500 dark:text-white" />
-                        <span className="text-gray-700 dark:text-white">
-                          {field.value
-                            ? formatDate(field.value)
-                            : "Chưa chọn ngày"}
-                        </span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-full rounded-lg border border-gray-200 p-0 shadow-lg"
-                      align="center"
+        <FormField
+          control={form.control}
+          name={fieldName}
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full cursor-pointer justify-start rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50"
                     >
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={(date) => {
-                          field.onChange(date);
-                          if (autoClose) {
-                            setIsPopoverOpen(false);
-                            onOpenChange(false);
-                          }
-                        }}
-                        disabled={
-                          disabledDate ||
-                          ((date) =>
-                            date <=
-                            (form.watch("checkIn") ||
-                              new Date(new Date().setHours(0, 0, 0, 0))))
+                      <CalendarIcon className="mr-3 h-5 w-5 text-gray-500 dark:text-white" />
+                      <span className="text-gray-700 dark:text-white">
+                        {field.value
+                          ? formatDate(field.value)
+                          : "Chưa chọn ngày"}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-full rounded-lg border border-gray-200 p-0 shadow-lg"
+                    align="center"
+                  >
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        if (autoClose) {
+                          setIsPopoverOpen(false);
+                          onOpenChange(false);
                         }
-                        initialFocus
-                        classNames={{
-                          caption: "flex justify-center items-center relative",
-                          caption_label: "text-lg font-bold text-rose-500 cursor-default",
-                          nav: "flex items-center",
-                          nav_button: "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 cursor-pointer",
-                          nav_button_previous: "absolute left-2",
-                          nav_button_next: "absolute right-2",
-                          head_cell: "text-red-500 font-bold flex items-center justify-center w-full py-2",
-                          row: "flex gap-1 mt-1",
-                          day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100",
-                          day_selected: "bg-rose-600 text-white hover:bg-rose-600 hover:text-white",
-                          day_today: "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50",
-                        }}                                          
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {!autoClose && (
-            <Button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="w-full rounded-lg bg-rose-500 py-3 text-base font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-rose-600"
-            >
-              Xác nhận
-            </Button>
+                      }}
+                      disabled={
+                        disabledDate ||
+                        ((date) =>
+                          date <=
+                          (form.watch("checkIn") ||
+                            new Date(new Date().setHours(0, 0, 0, 0))))
+                      }
+                      initialFocus
+                      classNames={{
+                        caption: "flex justify-center items-center relative",
+                        caption_label: "text-lg font-bold text-rose-500 cursor-default",
+                        nav: "flex items-center",
+                        nav_button: "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 cursor-pointer",
+                        nav_button_previous: "absolute left-2",
+                        nav_button_next: "absolute right-2",
+                        head_cell: "text-red-500 font-bold flex items-center justify-center w-full py-2",
+                        row: "flex gap-1 mt-1",
+                        day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100",
+                        day_selected: "bg-rose-600 text-white hover:bg-rose-600 hover:text-white",
+                        day_today: "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        </div>
+        />  
       </DialogContent>
     </Dialog>
   );

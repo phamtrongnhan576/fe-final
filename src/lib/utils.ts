@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { Comment } from "./client/types/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -70,3 +71,7 @@ export const formatDateTime = (dateInput: Date) => {
     return `vừa xong`;
   }
 }
+
+export const sortCommentsByIdDescending = (comments: Comment[]): Comment[] => {
+  return [...comments].sort((a, b) => b.id - a.id);
+};

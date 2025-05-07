@@ -17,4 +17,39 @@ export const searchSchema = z.object({
       path: ["checkOut"],
     });
   }
-}); 
+});
+
+export const bookingSchema = z.object({
+  id: z.number(),
+  maPhong: z.number(),
+  ngayDen: z
+    .date({ required_error: "Vui lòng chọn ngày nhận phòng" })
+    .refine((date) => date >= new Date(), {
+      message: "Ngày nhận phòng không được trước ngày hiện tại",
+    }),
+  ngayDi: z.date({ required_error: "Vui lòng chọn ngày trả phòng" }),
+  soLuongKhach: z.number().min(1, "Số lượng khách phải lớn hơn 0"),
+  maNguoiDung: z.number().min(1, "Vui lòng đăng nhập để đặt phòng"),
+}).superRefine((data, ctx) => {
+  if (data.ngayDen && data.ngayDi && data.ngayDi <= data.ngayDen) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Ngày trả phòng phải sau ngày nhận phòng",
+      path: ["ngayDi"],
+    });
+  }
+});
+
+export const commentSchema = z.object({
+  id: z.number(),
+  maPhong: z.number(),
+  maNguoiBinhLuan: z.number().min(1, "Vui lòng đăng nhập để bình luận"),
+  ngayBinhLuan: z
+    .date({ required_error: "Ngày bình luận không hợp lệ" })
+  ,
+  noiDung: z.string().min(1, "Nội dung bình luận không được để trống"),
+  saoBinhLuan: z
+    .number()
+    .min(1, "Số sao phải từ 1 đến 5")
+    .max(5, "Số sao phải từ 1 đến 5"),
+});

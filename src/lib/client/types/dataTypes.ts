@@ -1,3 +1,10 @@
+import { IconType } from 'react-icons';
+import { ForwardRefExoticComponent, RefAttributes } from 'react';
+import { LucideProps } from 'lucide-react';
+import { Wifi, Tv, ParkingSquare } from 'lucide-react';
+import { MdIron } from 'react-icons/md';
+import { FaHandsWash, FaSwimmingPool } from 'react-icons/fa';
+
 type NavItem = {
   key: string;
   label: string;
@@ -14,6 +21,25 @@ type ListHomeRooms = {
   title: string;
   image: string;
 };
+
+// Định nghĩa kiểu cho Icon
+export type IconComponent =
+  | ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>>
+  | IconType;
+
+export type AmenityItem = {
+  Icon: IconComponent;
+  label: string;
+};
+
+export const amenities: AmenityItem[] = [
+  { Icon: Wifi, label: "Wifi" },
+  { Icon: Tv, label: "Tivi" },
+  { Icon: ParkingSquare, label: "Bãi đỗ xe" },
+  { Icon: MdIron, label: "Bàn ủi" },
+  { Icon: FaSwimmingPool, label: "Hồ bơi" },
+  { Icon: FaHandsWash, label: "Máy giặt" },
+];
 
 export const navItems: NavItem[] = [
   { key: "home", label: "Home", href: "/" },
@@ -58,7 +84,7 @@ export const listInforPositions: ListInforPositions[] = [
   }
 ]
 
-export const listHomeRooms: ListHomeRooms[] =[
+export const listHomeRooms: ListHomeRooms[] = [
   {
     href: "/rooms/ho-chi-minh",
     title: "Toàn bộ nhà",
