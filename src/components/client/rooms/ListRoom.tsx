@@ -11,8 +11,11 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { Heart } from 'lucide-react';
-import { Room, Position } from '@/lib/client/types/types';
-import { isValidUrl } from '@/lib/utils';
+import { Room, Position, PositionWithSlug } from '@/lib/client/types/types';
+import { formatISOToDDMMYYYY, isValidUrl } from '@/lib/utils';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/lib/client/store/store';
+import EmptyState from '../common/EmptyState';
 
 const mapContainerStyle = {
   width: '100%',
@@ -82,37 +85,56 @@ const concatDevice = (mayGiat: boolean, banLa: boolean, tivi: boolean, dieuHoa: 
   return listDevice.join(' • ')
 }
 
-export default function ListRoom({ rooms, position }: { rooms: Room[]; position: Position }) {
-  return (
-    <div className="mx-auto container grid grid-cols-1 lg:grid-cols-2 gap-3">
-      {/* Left Section: Room Listings */}
-      <div className="py-12 space-y-3">
-        <p>Có {rooms.length} chỗ ở tại Hồ Chí Minh • 04/05/2025 – 11/05/2025</p>
-        <h1 className="font-bold text-3xl text-black">Chỗ ở tại khu vực bản đồ đã chọn</h1>
-        <div className="space-y-6">
-          {rooms.map((room) => (
-            <RoomCard key={room.id} room={room} position={position} />
-          ))}
-        </div>
-      </div>
+export default function ListRoom({ rooms, position }: { rooms: Room[]; position: PositionWithSlug }) {
+  const searchData = useSelector((state: RootState) => state.search);
 
-      {/* Right Section: Map */}
-      <div className="h-screen w-full sticky top-28 mt-16">
-        <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}>
-          <GoogleMap
-            mapContainerStyle={mapContainerStyle}
-            center={center}
-            zoom={13}
-          >
+  if (rooms.length === 0) {
+    return (
+      <EmptyState
+        icon="home"
+        title="Không tìm thấy chỗ ở phù hợp"
+        description={`Chúng tôi không tìm thấy chỗ ở nào tại ${position.tinhThanh} trong khoảng thời gian bạn chọn.`}
+        actionText="Thử lại"
+      />
+    );
+  }
+
+  return (
+    <div className="mx-auto container">
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
+        {/* Left Section: Room Listings */}
+        <div className="py-12 space-y-3">
+          <p>
+            Có {rooms.length} chỗ ở tại {position.tinhThanh} •{" "}
+            {formatISOToDDMMYYYY(searchData.checkIn)} –{" "}
+            {formatISOToDDMMYYYY(searchData.checkOut)}
+          </p>
+          <h1 className="font-bold text-3xl text-black">Chỗ ở tại khu vực bản đồ đã chọn</h1>
+          <div className="space-y-6">
             {rooms.map((room) => (
-              <Marker
-                key={room.id}
-                position={filterPosition(room.maViTri)}
-                title={room.tenPhong}
-              />
+              <RoomCard key={room.id} room={room} position={position} />
             ))}
-          </GoogleMap>
-        </LoadScript>
+          </div>
+        </div>
+
+        {/* Right Section: Map */}
+        <div className="h-screen w-full sticky top-28 mt-16">
+          <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}>
+            <GoogleMap
+              mapContainerStyle={mapContainerStyle}
+              center={center}
+              zoom={13}
+            >
+              {rooms.map((room) => (
+                <Marker
+                  key={room.id}
+                  position={filterPosition(room.maViTri)}
+                  title={room.tenPhong}
+                />
+              ))}
+            </GoogleMap>
+          </LoadScript>
+        </div>
       </div>
     </div>
   );

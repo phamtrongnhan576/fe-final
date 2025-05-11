@@ -54,6 +54,7 @@ export const LocationDialog = ({
                       id="location-input"
                       placeholder="Tìm kiếm điểm đến"
                       onClick={() => setShowSuggestions(true)}
+                      onChange={(e) => field.onChange(e.target.value)}
                       onBlur={() => {
                         setTimeout(() => setShowSuggestions(false), 200);
                       }}
@@ -82,11 +83,15 @@ export const LocationDialog = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
                 className="absolute z-20 top-full left-0 w-full max-h-[34vh] overflow-x-hidden overflow-y-auto bg-white shadow-2xl"
               >
                 {positions.map((position, index) => (
                   <motion.div
                     key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
                     whileHover={{ scale: 1.02 }}
                     className="flex cursor-pointer items-center p-3 hover:bg-gray-100"
                     onClick={() => {
@@ -97,17 +102,18 @@ export const LocationDialog = ({
                     role="link"
                     tabIndex={0}
                   >
-                    <Image
-                      src={
-                        isValidUrl(position.hinhAnh)
-                          ? position.hinhAnh
-                          : "/placeholder.svg"
-                      }
-                      alt={position.tenViTri}
-                      width={48}
-                      height={48}
-                      className="mr-3 h-12 w-12 rounded-lg object-cover"
-                    />
+                    <div className="relative mr-3 h-12 w-12 overflow-hidden rounded-lg">
+                      <Image
+                        src={
+                          isValidUrl(position.hinhAnh)
+                            ? position.hinhAnh
+                            : "/placeholder.svg"
+                        }
+                        alt={position.tenViTri}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                     <div>
                       <p className="font-medium text-gray-900">
                         {position.tenViTri}
@@ -225,7 +231,7 @@ export const DatePickerDialog = ({
               <FormMessage />
             </FormItem>
           )}
-        />  
+        />
       </DialogContent>
     </Dialog>
   );
@@ -316,10 +322,8 @@ export const GuestDialog = ({
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-10 w-10 cursor-pointer rounded-full border-b-2 border-rose-600"
-                      onClick={() =>
-                        field.onChange(Math.max(0, field.value - 1))
-                      }
+                      className="h-10 w-10 cursor-pointer rounded-full border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                      onClick={() => field.onChange(Math.max(0, field.value - 1))}
                       disabled={field.value <= 0}
                     >
                       <span className="inline text-lg">-</span>
@@ -330,7 +334,7 @@ export const GuestDialog = ({
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-10 w-10 cursor-pointer rounded-full bg-rose-600 text-white hover:bg-rose-600 hover:text-white"
+                      className="h-10 w-10 cursor-pointer rounded-full border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                       onClick={() => field.onChange(field.value + 1)}
                     >
                       <span className="inline text-lg">+</span>
@@ -341,14 +345,6 @@ export const GuestDialog = ({
               </FormItem>
             )}
           />
-
-          <Button
-            type="button"
-            onClick={() => setShowGuestModal(false)}
-            className="w-full cursor-pointer rounded-lg bg-rose-500 py-3 text-base font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-rose-600"
-          >
-            Xác nhận số lượng khách
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

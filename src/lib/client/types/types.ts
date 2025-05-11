@@ -6,6 +6,10 @@ export interface Position {
   hinhAnh: string;
 }
 
+export interface PositionWithSlug extends Position {
+  slug: string;
+}
+
 export interface Room {
   id: number;
   tenPhong: string;
@@ -57,5 +61,39 @@ export interface Comment {
   saoBinhLuan: number;
   tenNguoiBinhLuan: string;
   avatar: string;
+}
+
+export interface PostComment {
+  maPhong: number;
+  maNguoiBinhLuan: number;
+  ngayBinhLuan: Date;
+  noiDung: string;
+  saoBinhLuan: number;
+}
+
+export interface SignIn {
+  email: string;
+  password: string;
+}
+
+export interface SignUp {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  birthday?: string;
+  gender: boolean;
+}
+
+export interface User {
+  id?: number;
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  birthday: string;
+  avatar: string;
+  gender: boolean;
+  role: string;
 }
 

@@ -1,39 +1,38 @@
-import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function FilterRoom() {
   return (
     <div className="mt-10 flex flex-wrap justify-center gap-3">
-      <Button
-        variant="outline"
-        className="rounded-lg text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent"
+      <Link
+        href="/under-dev"
+        className="rounded-lg border text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white"
       >
         Loại nơi ở
-      </Button>
-      <Button
-        variant="outline"
-        className="rounded-lg text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent"
+      </Link>
+      <Link
+        href="/under-dev"
+        className="rounded-lg border text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white"
       >
         Giá
-      </Button>
-      <Button
-        variant="outline"
-        className="rounded-lg text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent"
+      </Link>
+      <Link
+        href="/under-dev"
+        className="rounded-lg border text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white"
       >
         Đặt ngay
-      </Button>
-      <Button
-        variant="outline"
-        className="rounded-lg text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent"
+      </Link>
+      <Link
+        href="/under-dev"
+        className="rounded-lg border text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white"
       >
         Phòng và phòng ngủ
-      </Button>
-      <Button
-        variant="outline"
-        className="rounded-lg text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent"
+      </Link>
+      <Link
+        href="/under-dev"
+        className="rounded-lg border text-md px-6 py-2 text-black border-gray-300 duration-300 cursor-pointer hover:bg-rose-100 hover:text-rose-600 hover:border-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white"
       >
         Bộ lọc khác
-      </Button>
+      </Link>
     </div>
   );
 }
-

@@ -1,32 +1,59 @@
-  import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-  import Image from 'next/image';
-  import Link from 'next/link';
-  import { listHomeRooms } from '@/lib/client/types/dataTypes';
+'use client';
 
-  export default function HomeRooms() {
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
+import Link from 'next/link';
+import { listHomeRooms } from '@/lib/client/types/dataTypes';
+import { useEffect } from 'react';
+import AOS from 'aos';
+
+export default function HomeRooms() {
+  useEffect(() => {
+    AOS.init();
+  }, []);
+
   return (
-      <div className="container mx-auto space-y-3 pt-6 pb-16">
-        <h1 className="font-bold text-3xl">Ở bất cứ đâu</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-9">
-          {listHomeRooms.map((room, index) => (
-            <Link key={index} href={room.href} data-aos="flip-left">
-              <Card className="w-full hover:shadow-lg transition-shadow duration-300">
-                <CardHeader className="p-0">
-                  <Image
-                    src={room.image}
-                    alt={room.title}
-                    width={1920}
-                    height={1080}
-                    className="w-full h-48 object-cover rounded-t-lg"
-                  />
-                </CardHeader>
-                <CardContent className="p-4">
-                  <CardTitle className="text-lg font-medium">{room.title}</CardTitle>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+    <div className="max-w-md md:container mx-auto space-y-6 pt-8 pb-20">
+      <h1 className="font-bold text-3xl text-gray-800 dark:text-gray-100">
+        Ở bất cứ đâu
+      </h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {listHomeRooms.map((room, index) => (
+          <Link
+            key={index}
+            href={room.href}
+            className="group transition-transform duration-300 hover:scale-[1.02]"
+            data-aos="flip-left"
+          >
+            <Card className="w-full h-full overflow-hidden border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+              <CardHeader className="p-0 relative">
+                <div className="aspect-video overflow-hidden">
+                  <div className="w-full h-full transition-transform duration-500 group-hover:scale-105">
+                    <Image
+                      src={room.image}
+                      alt={room.title}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </CardHeader>
+
+              <CardContent className="p-4">
+                <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  {room.title}
+                </CardTitle>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Khám phá ngay
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
-    );
-  }
+    </div>
+  );
+}

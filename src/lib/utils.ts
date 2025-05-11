@@ -22,6 +22,30 @@ export const formatDate = (date?: Date) => {
   });
 };
 
+export const formatDateToDDMMYYYY = (date?: Date): string => {
+  if (!date) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+export const formatISOToDDMMYYYY = (isoString: string): string => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return "";
+  return formatDateToDDMMYYYY(date);
+};
+
+export const convertToISODate = (dateString: string, hour: string = "17:00:00.000Z"): string | undefined => {
+  if (!dateString) return undefined;
+  const [day, month, year] = dateString.split("/").map(Number);
+  if (!day || !month || !year) return undefined;
+  const date = new Date(year, month - 1, day);
+  if (isNaN(date.getTime())) return undefined;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${hour}`;
+};
+
 export const slugify = (str: string): string => {
   return str
     .normalize("NFD")

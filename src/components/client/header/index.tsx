@@ -32,8 +32,16 @@ const Header = () => {
     >
       <div className="relative container mx-auto flex items-center justify-between p-6">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/airbnb-1.svg" alt="Logo" width={40} height={40} />
-          <span className="text-custom-rose text-2xl font-extrabold tracking-tight">
+          <div className="w-7 h-7 md:w-9 md:h-9 relative">
+            <Image
+              src="/airbnb-1.svg"
+              alt="Logo"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+          <span className="text-custom-rose text-xl md:text-2xl font-extrabold tracking-tight">
             airbnb
           </span>
         </Link>

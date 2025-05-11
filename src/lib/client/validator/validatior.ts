@@ -41,7 +41,6 @@ export const bookingSchema = z.object({
 });
 
 export const commentSchema = z.object({
-  id: z.number(),
   maPhong: z.number(),
   maNguoiBinhLuan: z.number().min(1, "Vui lòng đăng nhập để bình luận"),
   ngayBinhLuan: z
@@ -52,4 +51,21 @@ export const commentSchema = z.object({
     .number()
     .min(1, "Số sao phải từ 1 đến 5")
     .max(5, "Số sao phải từ 1 đến 5"),
+});
+
+export const signInSchema = z.object({
+  email: z.string().email({ message: 'Vui lòng nhập email hợp lệ' }),
+  password: z.string().min(1, "Vui lòng nhập mật khẩu"),
+});
+
+export const signUpSchema = z.object({
+  name: z.string().min(1, "Vui lòng nhập tên"),
+  email: z.string().email({ message: "Vui lòng nhập email hợp lệ" }),
+  password: z.string().min(1, "Vui lòng nhập mật khẩu"),
+  phone: z
+    .string()
+    .min(10, "Vui lòng nhập số điện thoại hợp lệ")
+    .regex(/^[0-9]+$/, "Vui lòng nhập số điện thoại hợp lệ"),
+  birthday: z.string().min(1, "Vui lòng nhập ngày sinh"),
+  gender: z.boolean(),
 });

@@ -17,7 +17,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
       <Search />
       <FilterRoom />
       <main
-        className="flex-1 bg-white dark:bg-gray-900"
+        className="flex-1"
       >
         {children}
       </main>

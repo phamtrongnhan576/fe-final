@@ -3,8 +3,7 @@ import { Roboto } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-import { QueryClientWrapper } from "@/lib/client/providers";
-import AOSProvider from "@/lib/client/providers/AOSProvider";
+import ProviderRedux from "@/lib/client/store/StoreProvider"
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["300", "400", "700"] });
 
@@ -21,19 +20,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className}`} suppressHydrationWarning>
-        <AOSProvider>
-          <QueryClientWrapper>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </QueryClientWrapper>
-        </AOSProvider>
+       
+          <ProviderRedux>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </ProviderRedux>
+       
       </body>
     </html>
   );

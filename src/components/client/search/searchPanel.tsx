@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { Search, User, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn, formatDate, slugify } from "@/lib/utils";
-import { Position } from "@/lib/client/types/types";
+import { cn, formatDate } from "@/lib/utils";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,20 +14,21 @@ import { searchSchema } from "@/lib/client/validator/validatior";
 import { LocationDialog, CheckInDialog, CheckOutDialog, GuestDialog } from "./searchDialog";
 import { toast } from "sonner"
 import { useRouter } from "next/navigation";
+import { showErrorToast, showSuccessToast } from "@/lib/client/services/notificationService";
+import { useDispatch, useSelector } from "react-redux";
+import { setSearch } from "@/lib/client/store/slices/searchSlice";
+import { RootState } from "@/lib/client/store/store";
 
-interface SearchPanelClientProps {
-  positions: Position[];
-}
-
-const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
+export default function SearchPanel() {
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [showGuestModal, setShowGuestModal] = useState<boolean>(false);
   const [showLocationModal, setShowLocationModal] = useState<boolean>(false);
   const [showCheckInModal, setShowCheckInModal] = useState<boolean>(false);
   const [showCheckOutModal, setShowCheckOutModal] = useState<boolean>(false);
+  const dispatch = useDispatch();
   const router = useRouter();
+  const positions = useSelector((state: RootState) => state.position);
 
-  // Khởi tạo form
   const form = useForm<z.infer<typeof searchSchema>>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
@@ -40,17 +40,26 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
   });
 
   const handleSearch = async (data: z.infer<typeof searchSchema>) => {
-    const selectedPosition = positions.find(pos => pos.tenViTri === data.location);
-    if (!selectedPosition) {
-      toast.error("Không tìm thấy vị trí đã chọn", {
-        duration: 2000,
-        className: "!bg-red-50 !text-red-600 !font-bold !border-[3px] !text-lg !border-red-500",
-        position: "top-right",
-      });
-      return;
+    const listSearchs = {
+      location: data.location,
+      guests: data.guests,
+      checkIn: data.checkIn.toISOString(),
+      checkOut: data.checkOut.toISOString(),
     }
-    const slug = slugify(selectedPosition.tinhThanh);
-    router.push(`/rooms/${slug}`);
+
+    dispatch(setSearch(listSearchs))
+
+    const selectedPosition = positions.find(pos => pos.tenViTri === data.location)
+
+    if (!selectedPosition || !selectedPosition.tinhThanh) {
+      showErrorToast("Tìm kiếm thất bại!");
+      return;
+    };
+
+    showSuccessToast("Đang tìm kiếm ...")
+
+
+    router.push(`/rooms/${selectedPosition.slug}`);
   };
 
   const handleInvalid = () => {
@@ -87,12 +96,11 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
         onSubmit={form.handleSubmit(handleSearch, handleInvalid)}
         className="container mx-auto mt-8 flex items-center gap-2 rounded-full border border-gray-400 bg-white px-4 py-2 shadow-md transition-shadow md:mt-0 lg:max-w-5xl dark:border-gray-800 dark:bg-gray-900 dark:shadow-black"
       >
-        {/* Search Location Button */}
         <Button
           type="button"
           variant="ghost"
           className={cn(
-            "h-full flex-1 rounded-full px-4 py-2 text-left transition-shadow hover:cursor-pointer hover:shadow-xl",
+            "h-full flex-1 rounded-full px-4 py-2 text-left transition-all hover:bg-gray-100 hover:shadow-md dark:hover:bg-gray-700 cursor-pointer",
             (form.watch("location") ||
               form.watch("checkIn") ||
               form.watch("checkOut")) &&
@@ -101,34 +109,34 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
           onClick={() => setShowLocationModal(true)}
         >
           <div className="ml-2 flex w-full flex-col">
-            <span className="text-xs font-medium text-gray-600 dark:text-white">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
               Địa điểm
             </span>
             <div className="flex items-center gap-2">
-              <Search className="text-gray-500" />
-              <span className="truncate text-sm">
+              <Search className="text-gray-500 dark:text-gray-400" />
+              <span className="truncate text-sm text-gray-800 dark:text-gray-200">
                 {form.watch("location") || "Bạn muốn đi đâu?"}
               </span>
             </div>
           </div>
         </Button>
 
-        <div className="h-8 w-px bg-gray-400" />
+        <div className="h-8 w-px bg-gray-300 dark:bg-gray-600" />
 
         {/* Check-in Button */}
         <Button
           type="button"
           variant="ghost"
-          className="h-full flex-1 rounded-full px-4 py-2 text-left transition-shadow hover:cursor-pointer hover:shadow-xl"
+          className="h-full flex-1 rounded-full px-4 py-2 text-left transition-all hover:bg-gray-100 hover:shadow-md dark:hover:bg-gray-700 cursor-pointer"
           onClick={() => setShowCheckInModal(true)}
         >
           <div className="ml-2 flex w-full flex-col">
-            <span className="text-xs font-medium text-gray-600 dark:text-white">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
               Nhận phòng
             </span>
             <div className="flex items-center gap-2">
-              <CalendarIcon className="text-gray-500" />
-              <span className="text-sm">
+              <CalendarIcon className="text-gray-500 dark:text-gray-400" />
+              <span className="text-sm text-gray-800 dark:text-gray-200">
                 {form.watch("checkIn")
                   ? formatDate(form.watch("checkIn"))
                   : "Thêm ngày"}
@@ -137,22 +145,22 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
           </div>
         </Button>
 
-        <div className="h-8 w-px bg-gray-400" />
+        <div className="h-8 w-px bg-gray-300 dark:bg-gray-600" />
 
         {/* Check-out Button */}
         <Button
           type="button"
           variant="ghost"
-          className="h-full flex-1 rounded-full px-4 py-2 text-left transition-shadow hover:cursor-pointer hover:shadow-xl"
+          className="h-full flex-1 rounded-full px-4 py-2 text-left transition-all hover:bg-gray-100 hover:shadow-md dark:hover:bg-gray-700 cursor-pointer"
           onClick={() => setShowCheckOutModal(true)}
         >
           <div className="ml-2 flex w-full flex-col">
-            <span className="text-xs font-medium text-gray-600 dark:text-white">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
               Trả phòng
             </span>
             <div className="flex items-center gap-2">
-              <CalendarIcon className="text-gray-500" />
-              <span className="text-sm">
+              <CalendarIcon className="text-gray-500 dark:text-gray-400" />
+              <span className="text-sm text-gray-800 dark:text-gray-200">
                 {form.watch("checkOut")
                   ? formatDate(form.watch("checkOut"))
                   : "Thêm ngày"}
@@ -161,22 +169,22 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
           </div>
         </Button>
 
-        <div className="h-8 w-px bg-gray-400" />
+        <div className="h-8 w-px bg-gray-300 dark:bg-gray-600" />
 
         {/* Guests Button */}
         <Button
           type="button"
           variant="ghost"
-          className="h-full flex-1 rounded-full px-4 py-2 text-left transition-shadow hover:cursor-pointer hover:shadow-xl"
+          className="h-full flex-1 rounded-full px-4 py-2 text-left transition-all hover:bg-gray-100 hover:shadow-md dark:hover:bg-gray-700 cursor-pointer"
           onClick={() => setShowGuestModal(true)}
         >
           <div className="ml-2 flex w-full flex-col">
-            <span className="text-xs font-medium text-gray-600 dark:text-white">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
               Khách
             </span>
             <div className="flex items-center gap-2">
-              <User className="text-gray-500" />
-              <span className="text-sm">
+              <User className="text-gray-500 dark:text-gray-400" />
+              <span className="text-sm text-gray-800 dark:text-gray-200">
                 {form.watch("guests") > 0
                   ? `${form.watch("guests")} khách`
                   : "Thêm khách"}
@@ -188,9 +196,9 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
         {/* Search Button */}
         <Button
           type="submit"
-          className="flex cursor-pointer items-center gap-2 rounded-full bg-rose-600 py-6 text-white hover:bg-rose-700 hover:shadow-xl"
+          className="flex cursor-pointer items-center gap-2 rounded-full bg-rose-600 py-6 text-white hover:bg-rose-700 hover:shadow-md dark:bg-rose-700 dark:hover:bg-rose-800"
         >
-          <Search />
+          <Search className="text-white" />
           <span className="font-medium">Tìm kiếm</span>
         </Button>
 
@@ -225,5 +233,3 @@ const SearchPanel: React.FC<SearchPanelClientProps> = ({ positions }) => {
     </Form>
   );
 };
-
-export default SearchPanel;

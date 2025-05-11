@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, User, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,313 +18,404 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import Image from "next/image";
-import { Position } from "@/lib/client/types/types";
-import { isValidUrl } from "@/lib/utils";
+import { formatDate, isValidUrl, slugify } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import { searchSchema } from "@/lib/client/validator/validatior";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { setSearch } from "@/lib/client/store/slices/searchSlice";
+import { showErrorToast, showSuccessToast } from "@/lib/client/services/notificationService";
+import { RootState } from "@/lib/client/store/store";
 
-interface SearchPanelClientProps {
-  positions: Position[];
-}
-
-const SearchPanelMobile = ({ positions }: SearchPanelClientProps) => {
+const SearchPanelMobile = () => {
   const [showDialog, setShowDialog] = useState(false);
-  const [location, setLocation] = useState("");
-  const [checkIn, setCheckIn] = useState<Date | undefined>(undefined);
-  const [checkOut, setCheckOut] = useState<Date | undefined>(undefined);
-  const [guests, setGuests] = useState(0);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef(null);
+  const [openCheckIn, setOpenCheckIn] = useState(false);
+  const [openCheckOut, setOpenCheckOut] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const positions = useSelector((state: RootState) => state.position);
 
-  const handleGuestsChange = (delta: number) => {
-    setGuests((prev) => Math.max(0, prev + delta));
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && (suggestionsRef.current as HTMLElement).contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const form = useForm<z.infer<typeof searchSchema>>({
+    resolver: zodResolver(searchSchema),
+    defaultValues: {
+      location: "",
+      checkIn: undefined,
+      checkOut: undefined,
+      guests: 0,
+    },
+  });
+
+  const onSubmitForm = async (data: z.infer<typeof searchSchema>) => {
+    const listSearchs = {
+      location: data.location,
+      guests: data.guests,
+      checkIn: data.checkIn.toISOString(),
+      checkOut: data.checkOut.toISOString(),
+    }
+
+    dispatch(setSearch(listSearchs))
+
+    const selectedPosition = positions.find(pos => pos.tenViTri === data.location);
+
+    if (!selectedPosition || !selectedPosition.tinhThanh) {
+      showErrorToast("Tìm kiếm thất bại!");
+      return;
+    };
+
+    showSuccessToast("Đang tìm kiếm ...")
+
+    const slug = slugify(selectedPosition.tinhThanh);
+    router.push(`/rooms/${slug}`);
+    setShowDialog(false);
   };
-
-  const formatDate = (date?: Date) => {
-    if (!date) return "";
-    return date.toLocaleDateString("vi-VN", {
-      day: "numeric",
-      month: "short",
-    });
-  };
-
-  const clearInput = () => setLocation("");
 
   return (
-    <div className="w-full">
+    <div className="w-sm mx-auto">
       <Button
         variant="ghost"
-        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:text-white"
-        onClick={() => setShowDialog(true)}
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-700 dark:text-white"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setShowDialog(true)
+        }}
       >
         <Search className="h-5 w-5" />
         <span className="text-sm font-medium">Bắt đầu tìm kiếm</span>
       </Button>
-
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">
-              Tìm kiếm chỗ ở
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6">
-            {/* Địa điểm */}
-            <div className="space-y-2">
-              <div className="relative">
-                <label
-                  htmlFor="location-input"
-                  className="mb-2 block text-sm font-medium text-gray-700 dark:text-white"
-                >
-                  Địa điểm
-                </label>
-                <div className="relative">
-                  <Input
-                    id="location-input"
-                    placeholder="Tìm kiếm điểm đến"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    onFocus={() => setShowSuggestions(true)}
-                    onBlur={() =>
-                      setTimeout(() => setShowSuggestions(false), 200)
-                    }
-                    className="w-full rounded-lg border-gray-300 py-5 pl-10 text-base focus-visible:ring-0 focus-visible:outline-none dark:bg-gray-900 dark:text-white"
-                    aria-describedby="location-description"
-                  />
-                  <Search className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400" />
-                  {location && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-1/2 right-2 -translate-y-1/2 transform rounded-full"
-                      onClick={clearInput}
-                      aria-label="Xóa nội dung nhập"
-                    >
-                      <X />
-                    </Button>
-                  )}
-                </div>
-                <AnimatePresence>
-                  {showSuggestions && (
-                    <div className="absolute z-10 mt-2 max-h-[30vh] w-full overflow-x-hidden overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-xl dark:bg-gray-900">
-                      {positions.map((position, index) => (
-                        <motion.div
-                          key={index}
-                          whileHover={{ scale: 1.02 }}
-                          className="flex cursor-pointer items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => {
-                            setLocation(position.tenViTri);
-                            setShowSuggestions(false);
-                          }}
-                          role="link"
-                          tabIndex={0}
-                        >
-                          <Image
-                            src={ isValidUrl(position.hinhAnh)
-                              ? position.hinhAnh
-                              : "/placeholder.svg"}
-                            alt={position.tenViTri}
-                            width={48}
-                            height={48}
-                            className="mr-3 h-12 w-12 rounded-lg object-cover"
-                          />
-                          <div>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {position.tenViTri}
-                            </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {position.tinhThanh}
-                            </p>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmitForm)}>
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold">
+                  Tìm kiếm chỗ ở
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6">
+                {/* Địa điểm */}
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Địa điểm</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <div className="relative">
+                            <Input
+                              placeholder="Tìm kiếm điểm đến"
+                              {...field}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowSuggestions(true)
+                              }}
+                              className="w-full rounded-xl border-gray-300 py-5 pl-10 text-base shadow-sm transition-all dark:border-gray-700 dark:bg-gray-800 dark:text-white
+                              dark:placeholder:text-white placeholder:text-sm placeholder:text-gray-700"
+                            />
+                            <Search className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400 w-4 h-4" />
+                            {field.value && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-1/2 right-2 -translate-y-1/2 transform rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  field.onChange("")
+                                }}
+                              >
+                                <X />
+                              </Button>
+                            )}
                           </div>
-                        </motion.div>
-                      ))}
-                    </div>
+                          <AnimatePresence>
+                            {showSuggestions && (
+                              <motion.div
+                                ref={suggestionsRef}
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="absolute z-10 mt-2 max-h-[30vh] w-full overflow-x-hidden overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                              >
+                                {positions.map((position, index) => (
+                                  <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    whileHover={{ scale: 1.02 }}
+                                    className="flex cursor-pointer items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      field.onChange(position.tenViTri);
+                                      setShowSuggestions(false);
+                                    }}
+                                    role="link"
+                                    tabIndex={0}
+                                  >
+                                    <div className="relative mr-3 h-12 w-12 overflow-hidden rounded-lg">
+                                      <Image
+                                        src={
+                                          isValidUrl(position.hinhAnh)
+                                            ? position.hinhAnh
+                                            : "/placeholder.svg"
+                                        }
+                                        alt={position.tenViTri}
+                                        fill
+                                        className="object-cover"
+                                      />
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-gray-900 dark:text-white">
+                                        {position.tenViTri}
+                                      </p>
+                                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        {position.tinhThanh}
+                                      </p>
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            {/* Ngày check-in */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Ngày nhận phòng</label>
-              <div className="relative">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full cursor-pointer justify-start rounded-lg border-gray-300 py-5 pl-10 text-left hover:bg-gray-50"
-                    >
-                      <CalendarIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                      <span className="ml-6 text-gray-700 dark:text-white">
-                        {checkIn ? formatDate(checkIn) : "Thêm ngày"}
-                      </span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-[325px] rounded-lg border border-gray-200 p-0 shadow-lg"
-                    align="end"
-                    side="bottom"
-                    sideOffset={5}
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={checkIn}
-                      onSelect={setCheckIn}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                      className="w-full p-3"
-                      classNames={{
-                        day_selected: "bg-rose-600 text-white",
-                        day_today: "border-rose-600 font-bold",
-                        nav_button: "size-1.5rem",
-                      }}
-                      styles={{
-                        caption: {
-                          padding: "0.5rem 0",
-                          fontSize: "1rem",
-                          fontWeight: "500",
-                          color: "#111827",
-                        },
-                        caption_label: {
-                          textTransform: "capitalize",
-                        },
-                        head_cell: {
-                          padding: "0.5rem 0",
-                          fontSize: "0.875rem",
-                          fontWeight: "500",
-                          color: "#6b7280",
-                        },
-                        cell: {
-                          padding: "0.25rem",
-                        },
-                        day: {
-                          borderRadius: "6px",
-                          width: "2rem",
-                          height: "2rem",
-                          fontSize: "0.875rem",
-                        },
-                        nav_button: {
-                          width: "1.5rem",
-                          height: "1.5rem",
-                        },
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-
-            {/* Ngày check-out */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Ngày trả phòng</label>
-              <div className="relative">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full cursor-pointer justify-start rounded-lg border-gray-300 py-5 pl-10 text-left hover:bg-gray-50"
-                    >
-                      <CalendarIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                      <span className="ml-6 text-gray-700 dark:text-white">
-                        {checkOut ? formatDate(checkOut) : "Thêm ngày"}
-                      </span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-[325px] rounded-lg border border-gray-200 p-0 shadow-lg"
-                    align="end"
-                    side="bottom"
-                    sideOffset={5}
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={checkOut}
-                      onSelect={setCheckOut}
-                      disabled={(date) =>
-                        date <=
-                        (checkIn || new Date(new Date().setHours(0, 0, 0, 0)))
-                      }
-                      initialFocus
-                      className="w-full p-3"
-                      classNames={{
-                        day_selected: "bg-rose-600 text-white",
-                        day_today: "border-rose-600 font-bold",
-                        nav_button: "size-1.5rem",
-                      }}
-                      styles={{
-                        caption: {
-                          padding: "0.5rem 0",
-                          fontSize: "1rem",
-                          fontWeight: "500",
-                          color: "#111827",
-                        },
-                        caption_label: {
-                          textTransform: "capitalize",
-                        },
-                        head_cell: {
-                          padding: "0.5rem 0",
-                          fontSize: "0.875rem",
-                          fontWeight: "500",
-                          color: "#6b7280",
-                        },
-                        cell: {
-                          padding: "0.25rem",
-                        },
-                        day: {
-                          borderRadius: "6px",
-                          width: "2rem",
-                          height: "2rem",
-                          fontSize: "0.875rem",
-                        },
-                        nav_button: {
-                          width: "1.5rem",
-                          height: "1.5rem",
-                        },
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-
-            {/* Số khách */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Số khách</label>
-              <div className="relative">
-                <Input
-                  placeholder="Thêm khách"
-                  value={guests > 0 ? `${guests} khách` : ""}
-                  readOnly
-                  className="w-full rounded-lg border-gray-300 py-5 pl-10"
                 />
-                <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleGuestsChange(-1)}
-                    disabled={guests <= 0}
-                  >
-                    -
-                  </Button>
-                  <span className="w-6 text-center">{guests}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleGuestsChange(1)}
-                  >
-                    +
-                  </Button>
-                </div>
-              </div>
-            </div>
 
-            {/* Nút tìm kiếm */}
-            <Button
-              className="w-full cursor-pointer rounded-lg bg-rose-500 py-5 text-lg font-medium text-white shadow-md hover:bg-rose-600"
-              size="lg"
-            >
-              <Search className="mr-2 h-5 w-5" />
-              Tìm kiếm
-            </Button>
-          </div>
+                {/* Ngày nhận phòng */}
+                <FormField
+                  control={form.control}
+                  name="checkIn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ngày nhận phòng</FormLabel>
+                      <FormControl>
+                        <Popover open={openCheckIn} onOpenChange={setOpenCheckIn}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full cursor-pointer justify-start rounded-lg border-gray-300 py-5 pl-10 text-left hover:bg-gray-50 relative"
+                            >
+                              <CalendarIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                              <span className="ml-6 text-gray-700 dark:text-white">
+                                {field.value ? formatDate(field.value) : "Thêm ngày"}
+                              </span>
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[325px] rounded-lg border border-gray-200 p-0 shadow-lg dark:bg-gray-800 dark:border-gray-700"
+                            align="start"
+                          >
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={(date) => {
+                                field.onChange(date);
+                                setOpenCheckIn(false);
+                              }}
+                              disabled={(date) =>
+                                date <=
+                                (field.value || new Date(new Date().setHours(0, 0, 0, 0)))
+                              }
+                              initialFocus
+                              classNames={{
+                                // Header (caption)
+                                caption: "flex justify-center items-center relative",
+                                caption_label: "text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default",
+
+                                // Navigation buttons (Previous/Next)
+                                nav: "flex items-center",
+                                nav_button: "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer",
+                                nav_button_previous: "absolute left-2",
+                                nav_button_next: "absolute right-2",
+
+                                // Weekday headers (Mon, Tue,...)
+                                head_cell: "text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2",
+
+                                // Calendar grid
+                                row: "flex gap-1 mt-1",
+
+                                // Normal day
+                                day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700",
+
+                                // Selected day
+                                day_selected: "bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800",
+
+                                // Today
+                                day_today: "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700",
+                              }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Ngày trả phòng */}
+                <FormField
+                  control={form.control}
+                  name="checkOut"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ngày trả phòng</FormLabel>
+                      <FormControl>
+                        <Popover open={openCheckOut} onOpenChange={setOpenCheckOut}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full cursor-pointer justify-start rounded-lg border-gray-300 py-5 pl-10 text-left hover:bg-gray-50 relative"
+                            >
+                              <CalendarIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                              <span className="ml-6 text-gray-700 dark:text-white">
+                                {field.value ? formatDate(field.value) : "Thêm ngày"}
+                              </span>
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[325px] rounded-lg border border-gray-200 p-0 shadow-lg dark:bg-gray-800 dark:border-gray-700"
+                            align="start"
+                          >
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={(date) => {
+                                field.onChange(date);
+                                setOpenCheckOut(false);
+                              }}
+                              disabled={(date) => {
+                                if (form.watch("checkIn")) return date <= form.watch("checkIn");
+                                return date <=
+                                  (field.value || new Date(new Date().setHours(0, 0, 0, 0)))
+                              }}
+                              initialFocus
+                              classNames={{
+                                // Header (caption)
+                                caption: "flex justify-center items-center relative",
+                                caption_label: "text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default",
+
+                                // Navigation buttons (Previous/Next)
+                                nav: "flex items-center",
+                                nav_button: "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer",
+                                nav_button_previous: "absolute left-2",
+                                nav_button_next: "absolute right-2",
+
+                                // Weekday headers (Mon, Tue,...)
+                                head_cell: "text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2",
+
+                                // Calendar grid
+                                row: "flex gap-1 mt-1",
+
+                                // Normal day
+                                day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700",
+
+                                // Selected day
+                                day_selected: "bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800",
+
+                                // Today
+                                day_today: "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700",
+                              }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Số khách */}
+                <FormField
+                  control={form.control}
+                  name="guests"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Số khách</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder="Thêm khách"
+                            value={field.value > 0 ? `${field.value} khách` : ""}
+                            readOnly
+                            className="w-full rounded-lg border-gray-300 py-5 pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-white placeholder:text-sm placeholder:text-gray-700"
+                          />
+                          <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                          <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8 cursor-pointer rounded-full border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                field.onChange(Math.max(0, field.value - 1))
+                              }}
+                              disabled={field.value <= 0}
+                              type="button"
+                            >
+                              -
+                            </Button>
+                            <span className="w-6 text-center">{field.value}</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8 cursor-pointer rounded-full border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                field.onChange(field.value + 1)
+                              }}
+                              type="button"
+                            >
+                              +
+                            </Button>
+                          </div>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Nút tìm kiếm */}
+                <Button
+                  type="submit"
+                  className="w-full cursor-pointer rounded-lg bg-rose-500 py-5 text-lg font-medium text-white shadow-md hover:bg-rose-600"
+                  size="lg"
+                >
+                  <Search className="mr-2 h-5 w-5" />
+                  Tìm kiếm
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>

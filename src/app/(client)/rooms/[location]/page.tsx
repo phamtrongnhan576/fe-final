@@ -1,16 +1,37 @@
-import { fetchPosition } from "@/lib/client/services/fetch";
-import { slugify } from "@/lib/utils";
-import RoomsContent from "../../../../components/client/rooms/RoomsContent";
+"use client";
 
-export default async function RoomsPage({ params }: { params: Promise<{ location: string }> }) {
-  const { location } = await params;
-  
-  const positions = await fetchPosition();
-  const position = positions.find(pos => slugify(pos.tinhThanh) === location);
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/client/store/store";
+import { useParams } from "next/navigation";
+import useSWR from "swr";
+import { getRoomsByPosition } from "@/lib/client/services/apiService";
+import ListRoom from "@/components/client/rooms/ListRoom";
+import Loading from "@/components/client/common/Loading";
+import Error from "@/components/client/common/Error";
 
-  if (!position) {
-    return <div>Location not found</div>;
-  }
-  
-  return <RoomsContent id={position.id.toString()} position={position} />;
+export default function RoomsPage() {
+  const params = useParams();
+  const { location } = params;
+
+  const positions = useSelector((state: RootState) => state.position);
+
+  const position = positions.find((pos) => pos.slug === location)
+
+  const key = position?.id
+    ? `/api/phong-thue/lay-phong-theo-vi-tri/${position.id}`
+    : null;
+
+  const fetcher = () => getRoomsByPosition(position!.id.toString());
+
+  const { data: rooms, error, isLoading } = useSWR(key, fetcher);
+
+  if (error) return <Error />;
+  if (!position) return <Error />;
+  if (isLoading) return <Loading />;
+
+  return (
+    <div>
+      <ListRoom rooms={rooms ?? []} position={position!} />
+    </div>
+  );
 }

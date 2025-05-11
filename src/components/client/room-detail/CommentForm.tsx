@@ -11,12 +11,14 @@ import { z } from 'zod';
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from 'react';
+import { createComment } from '@/lib/client/services/apiService';
+import { handleApiError } from '@/lib/client/services/notificationService';
+import { AxiosError } from 'axios';
 
 export default function CommentForm({ id }: { id: number }) {
   const form = useForm<z.infer<typeof commentSchema>>({
     resolver: zodResolver(commentSchema),
     defaultValues: {
-      id: 0,
       maPhong: id,
       maNguoiBinhLuan: 47042,
       ngayBinhLuan: new Date(Date.now()),
@@ -25,8 +27,12 @@ export default function CommentForm({ id }: { id: number }) {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof commentSchema>) => {
-    console.log('Comment data:', data);
+  const onSubmit = async (data: z.infer<typeof commentSchema>) => {
+    try {
+      await createComment(data)
+    } catch (error) {
+      handleApiError(error as AxiosError);
+    }
   };
 
   return (

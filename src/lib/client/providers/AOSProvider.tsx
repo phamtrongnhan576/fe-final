@@ -1,14 +1,13 @@
 'use client';
 
 import AOS from 'aos';
-import { Fragment, ReactNode, useEffect } from 'react';
-    
-const AOSProvider = ({ children }: { children: ReactNode }) => {
-   useEffect(() => {
-     AOS.init();
-   }, []);
+import 'aos/dist/aos.css';
+import { useEffect } from 'react';
 
-   return <Fragment>{children}</Fragment>;
-};
+export default function AOSProvider({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    AOS.init();
+  }, []);
 
- export default AOSProvider;
+  return <>{children}</>;
+}

@@ -1,4 +1,4 @@
-import { getCommentsById, getRoomsById } from "@/lib/client/services/fetch";
+import { getCommentsById, getRoomsById } from "@/lib/client/services/apiService";
 import { sortCommentsByIdDescending } from "@/lib/utils";
 import CommentsSection from "@/components/client/rooms/CommentsSection";
 import RoomHeader from "@/components/client/room-detail/RoomHeader";
@@ -10,8 +10,10 @@ import RoomImage from "@/components/client/room-detail/RoomImage";
 
 export default async function RoomDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  
   const room = await getRoomsById(id);
   const comments = await getCommentsById(id);
+
   const sortedComments = sortCommentsByIdDescending(comments);
 
   return (

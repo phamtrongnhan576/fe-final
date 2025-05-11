@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User } from "lucide-react";
 import { navItems } from "@/lib/client/types/dataTypes";
 
 type MobileMenuProps = {
@@ -18,39 +16,55 @@ const MobileMenu = ({ visible, setVisible, pathname }: MobileMenuProps) => {
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="block overflow-hidden border-t border-gray-200 bg-white md:hidden dark:border-gray-700 dark:bg-gray-900"
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="fixed inset-x-0 top-16 z-50 block overflow-hidden border-t border-gray-200 bg-white shadow-lg md:hidden dark:border-gray-700 dark:bg-gray-900"
         >
-          <ul className="flex flex-col gap-4 p-6">
+          <motion.ul
+            className="flex flex-col space-y-4 p-6"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1,
+                  delayChildren: 0.2
+                }
+              }
+            }}
+          >
             {navItems.map((item) => (
-              <li key={item.key}>
+              <motion.li
+                key={item.key}
+                variants={{
+                  hidden: { x: -20, opacity: 0 },
+                  visible: { x: 0, opacity: 1 }
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
                 <Link
                   href={item.href}
-                  className={`font-medium transition-colors duration-200 ${
-                    pathname === item.href
-                      ? "text-custom-rose"
-                      : "hover:text-custom-rose dark:hover:text-custom-rose text-gray-600 dark:text-gray-300"
-                  }`}
+                  className={`flex items-center py-3 px-4 text-lg font-medium transition-all duration-200 rounded-lg ${pathname === item.href
+                      ? "text-custom-rose bg-rose-50 dark:bg-gray-800"
+                      : "text-gray-600 hover:text-custom-rose hover:bg-gray-100 dark:text-gray-300 dark:hover:text-custom-rose dark:hover:bg-gray-800"
+                    }`}
                   onClick={() => setVisible(false)}
                 >
                   {item.label}
                 </Link>
-              </li>
+              </motion.li>
             ))}
-          </ul>
+          </motion.ul>
 
-          <div className="border-t p-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-12 w-12">
-                <AvatarFallback className="border-custom-rose border-3 bg-black">
-                  <User
-                    className="text-white"
-                    style={{ width: "25px", height: "25px" }}
-                  />
-                </AvatarFallback>
-              </Avatar>
-              {/* <span className="font-medium dark:text-gray-300">minh</span> */}
-            </div>
+          <div className="px-6 pb-6">
+            <button
+              onClick={() => setVisible(false)}
+              className="w-full py-3 text-sm font-medium text-center text-gray-500 transition-colors duration-200 rounded-lg hover:text-custom-rose hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 cursor-pointer"
+            >
+              Close Menu
+            </button>
           </div>
         </motion.div>
       )}

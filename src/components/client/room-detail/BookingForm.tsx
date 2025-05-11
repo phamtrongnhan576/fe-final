@@ -130,81 +130,87 @@ function DatePicker() {
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
 
   return (
-    <div className="flex gap-2 justify-between items-start">
-      <FormField
-        control={form.control}
-        name="ngayDen"
-        render={({ field }) => (
-          <FormItem className="flex-1">
-            <FormControl>
-              <Popover open={isCheckInOpen} onOpenChange={setIsCheckInOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start items-center rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50"
-                  >
-                    <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
-                    <span className="text-gray-700">
-                      {field.value ? formatDate(field.value) : 'Chọn ngày nhận phòng'}
-                    </span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={(date) => {
-                      field.onChange(date);
-                      setIsCheckInOpen(false);
-                    }}
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </FormControl>
-            <FormMessage className="text-xs text-red-500 mt-1 min-h-[20px]" />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="ngayDi"
-        render={({ field }) => (
-          <FormItem className="flex-1">
-            <FormControl>
-              <Popover open={isCheckOutOpen} onOpenChange={setIsCheckOutOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start items-center rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50"
-                  >
-                    <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
-                    <span className="text-gray-700">
-                      {field.value ? formatDate(field.value) : 'Chọn ngày trả phòng'}
-                    </span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={(date) => {
-                      field.onChange(date);
-                      setIsCheckOutOpen(false);
-                    }}
-                    disabled={(date) =>
-                      date <= form.watch('ngayDen') || date < new Date(new Date().setHours(0, 0, 0, 0))
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </FormControl>
-            <FormMessage className="text-xs text-red-500 mt-1 min-h-[20px]" />
-          </FormItem>
-        )}
-      />
+    <div className="grid grid-cols-2 gap-2 border-b pb-4">
+      <div>
+        <label className="text-sm font-medium">Nhận phòng</label>
+        <FormField
+          control={form.control}
+          name="ngayDen"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormControl>
+                <Popover open={isCheckInOpen} onOpenChange={setIsCheckInOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start items-center rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50"
+                    >
+                      <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
+                      <span className="text-gray-700">
+                        {field.value ? formatDate(field.value) : 'Chọn ngày nhận phòng'}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        setIsCheckInOpen(false);
+                      }}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </FormControl>
+              <FormMessage className="text-xs text-red-500 mt-1 min-h-[20px]" />
+            </FormItem>
+          )}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium">Trả phòng</label>
+        <FormField
+          control={form.control}
+          name="ngayDi"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormControl>
+                <Popover open={isCheckOutOpen} onOpenChange={setIsCheckOutOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start items-center rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50"
+                    >
+                      <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
+                      <span className="text-gray-700">
+                        {field.value ? formatDate(field.value) : 'Chọn ngày trả phòng'}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        setIsCheckOutOpen(false);
+                      }}
+                      disabled={(date) =>
+                        date <= form.watch('ngayDen') || date < new Date(new Date().setHours(0, 0, 0, 0))
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </FormControl>
+              <FormMessage className="text-xs text-red-500 mt-1 min-h-[20px]" />
+            </FormItem>
+          )}
+        />
+      </div>
     </div>
   );
 }
