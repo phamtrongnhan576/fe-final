@@ -1,8 +1,13 @@
+'use client'
+
 import { Room } from '@/lib/client/types/types';
 import { Star } from 'lucide-react';
-import Link from "next/link";
+import { useSelector } from 'react-redux';
+import { RootState } from '@/lib/client/store/store';
 
-export default function RoomHeader({ room }: {room: Room}) {
+export default function RoomHeader({ room }: { room: Room }) {
+  const positions = useSelector((state: RootState) => state.position);
+  const positionDetail = positions.find((position) => position.id === room.id);
   return (
     <>
       {/* Room title */}
@@ -17,15 +22,14 @@ export default function RoomHeader({ room }: {room: Room}) {
             <div className="flex gap-x-6">
               <span className="flex items-center space-x-2">
                 <Star className="w-4 h-4 text-[#FF5A5F]" />
-                <span className="text-gray-600">Chủ nhà siêu cấp</span>
+                <span className="text-gray-600 dark:text-white">Chủ nhà siêu cấp</span>
               </span>
             </div>
-            <Link
-              className="underline cursor-pointer text-gray-600 hover:text-[#FF5A5F] duration-300"
-              href="/rooms/ho-chi-minh"
+            <span
+              className="dark:text-white text-gray-600 hover:text-[#FF5A5F] duration-300"
             >
-              Hồ Chí Minh, Việt Nam
-            </Link>
+              {positionDetail?.tinhThanh}, {positionDetail?.quocGia}
+            </span>
           </div>
         </div>
       </div>

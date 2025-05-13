@@ -25,7 +25,7 @@ export default function CommentsSection({ comments }: CommentsSectionProps) {
 
   return (
     <div>
-      <h3 className="font-bold text-xl">Bình luận</h3>
+      <h3 className="font-bold text-xl mb-4">Bình luận</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 px-2 h-80 overflow-y-auto">
         {paginatedComments.map((comment: Comment, index: number) => (
           <div key={index} className="space-y-3">
@@ -50,7 +50,7 @@ export default function CommentsSection({ comments }: CommentsSectionProps) {
                     ))}
                   </span>
                 )}
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm dark:text-white">
                   <time>{formatDateTime(comment.ngayBinhLuan)}</time>
                 </p>
               </div>

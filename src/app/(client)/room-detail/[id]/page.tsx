@@ -17,7 +17,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ id:
   const sortedComments = sortCommentsByIdDescending(comments);
 
   return (
-    <div className="container mx-auto py-5 space-y-5">
+    <div className="max-w-md md:container mx-auto py-5 space-y-5">
       {/* Room title */}
       <RoomHeader room={room} />
 

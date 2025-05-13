@@ -1,5 +1,5 @@
 import axiosInstance from "./axiosInstance";
-import { Comment, defaultRoom, Position, PostComment, Room, SignIn, SignUp, User } from "../types/types";
+import { Comment, defaultRoom, Position, PostComment, Room, SignIn, SignUp, User, Booking } from "../types/types";
 
 export async function fetchPosition(): Promise<Position[]> {
   try {
@@ -57,6 +57,17 @@ export async function createComment(data: PostComment): Promise<void> {
     const response = await axiosInstance.post(`/api/binh-luan`, data);
     if (response.statusText !== "OK") {
       throw new Error(response.data.message || "Không thể gửi bình luận");
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function createBooking(data: Booking): Promise<void> {
+  try {
+    const response = await axiosInstance.post(`/api/dat-phong`, data);
+    if (response.data.statusCode !== 201) {
+      throw new Error(response.data.message || "Không thể đặt phòng");
     }
   } catch (error) {
     throw error;

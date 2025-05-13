@@ -65,7 +65,7 @@ export default function RoomDetails() {
 
       {/* Description */}
       <div className="w-full">
-        <button className="w-full text-black bg-white border-2 border-black rounded-lg py-3 hover:bg-rose-100 hover:text-rose-600 duration-300 flex justify-between items-center px-6 cursor-pointer hover:border-transparent">
+        <button className="w-full text-black bg-white border-2 border-black rounded-lg py-1 hover:bg-rose-100 hover:text-rose-600 duration-300 flex justify-between items-center px-6 cursor-pointer hover:border-transparent">
           <span>Dịch sang tiếng Anh</span>
           <FaLanguage className="!w-12 !h-12" />
         </button>
@@ -90,7 +90,7 @@ function Feature({ Icon, title, description, hasMoreButton = false }: FeaturePro
       <div className="space-y-2">
         <h4 className="text-sm font-bold">{title}</h4>
         {description && (
-          <p className="text-sm text-gray-600 text-justify">
+          <p className="text-sm text-gray-600 text-justify dark:text-white">
             {description}
             {hasMoreButton && (
               <span className="underline font-bold cursor-pointer"> Hiển thị thêm</span>

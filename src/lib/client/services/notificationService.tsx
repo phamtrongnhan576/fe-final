@@ -1,11 +1,20 @@
 import { toast } from "sonner";
 import { AxiosError } from "axios";
+import { X } from "lucide-react";
+
 
 export const showSuccessToast = (message: string) => {
   toast.success(message, {
     duration: 2000,
-    className: "!bg-green-50 !text-green-600 !font-bold !border-[2px] !text-lg !border-green-500",
+    className:
+      "!bg-green-50 !text-green-600 !font-bold !border-[2px] !text-lg !border-green-500 px-4 py-2",
     position: "top-right",
+    action: {
+      label: <X className="w-5 h-5 text-green-600 cursor-pointer" />,
+      onClick: () => {
+        toast.dismiss();
+      },
+    },
   });
 };
 
@@ -14,6 +23,12 @@ export const showErrorToast = (message: string) => {
     duration: 2000,
     className: "!bg-red-50 !text-red-600 !font-bold !border-[2px] !text-md !border-red-500",
     position: "top-right",
+    action: {
+      label: <X className="w-5 h-5 text-red-600 cursor-pointer" />,
+      onClick: () => {
+        toast.dismiss();
+      },
+    },
   });
 };
 

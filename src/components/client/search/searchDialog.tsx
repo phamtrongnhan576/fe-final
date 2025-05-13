@@ -1,3 +1,5 @@
+"use client"
+
 import { DialogTitle, DialogHeader, DialogContent, Dialog, DialogDescription } from "@/components/ui/dialog";
 import { Position } from "@/lib/client/types/types";
 import { searchSchema } from "@/lib/client/validator/validatior";
@@ -13,7 +15,8 @@ import { isValidUrl } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { formatDate } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useDebounce } from "react-use";
 
 export const LocationDialog = ({
   showLocationModal,
@@ -30,13 +33,141 @@ export const LocationDialog = ({
   setShowSuggestions: (value: boolean) => void;
   positions: Position[];
 }) => {
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+
+  const normalizeText = useCallback(
+    (text: string) => text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase(),
+    []
+  );
+
+  const highlightText = useCallback(
+    (text: string, query: string) => {
+      if (!query || !normalizeText(text).includes(query)) return text;
+      const regex = new RegExp(`(${query})`, "gi");
+      const normalized = normalizeText(text);
+      const parts = normalized.split(regex);
+      let index = 0;
+      return parts.map((part, i) => {
+        const orig = text.slice(index, index + part.length);
+        index += part.length;
+        return part.toLowerCase() === query.toLowerCase() ? (
+          <span key={i} className="bg-yellow-200" title={orig}>
+            {orig}
+          </span>
+        ) : (
+          orig
+        );
+      });
+    },
+    [normalizeText]
+  );
+
+  const filteredPositions = useMemo(() => {
+    if (!debouncedSearch) return positions.slice(0, 10);
+    const normalizedSearch = normalizeText(debouncedSearch);
+    return positions
+      .filter(
+        (p) =>
+          normalizeText(p.tenViTri).includes(normalizedSearch) ||
+          normalizeText(p.tinhThanh).includes(normalizedSearch)
+      )
+      .slice(0, 10);
+  }, [debouncedSearch, positions, normalizeText]);
+
+  const SuggestionItem = useCallback(
+    ({ position, onSelect }: { position: Position; onSelect: () => void }) => {
+      return (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.2 }}
+          whileHover={{ scale: 1.02 }}
+          className="flex cursor-pointer items-center p-3 hover:bg-gray-100"
+          onClick={onSelect}
+          role="link"
+          tabIndex={0}
+        >
+          <div className="relative mr-3 h-12 w-12 overflow-hidden rounded-lg">
+            <Image
+              src={isValidUrl(position.hinhAnh) ? position.hinhAnh : "/placeholder.svg"}
+              alt={position.tenViTri}
+              fill
+              className="object-cover"
+            />
+          </div>
+          <div className="truncate max-w-[calc(100%-4rem)]">
+            <p className="font-medium text-gray-900 truncate" title={position.tenViTri}>
+              {highlightText(position.tenViTri, debouncedSearch)}
+            </p>
+            <p className="text-sm text-gray-500 truncate" title={position.tinhThanh}>
+              {highlightText(position.tinhThanh, debouncedSearch)}
+            </p>
+          </div>
+        </motion.div>
+      );
+    },
+    [debouncedSearch, highlightText]
+  );
+
+  const handleInputChange = useCallback((value: string) => {
+    setSearchValue(value);
+    setIsLoading(true);
+  }, []);
+
+  useDebounce(
+    () => {
+      setDebouncedSearch(normalizeText(searchValue));
+      setIsLoading(false);
+    },
+    500,
+    [searchValue, normalizeText]
+  );
+
+  const SuggestionsList = useMemo(() => {
+    if (positions.length === 0) {
+      return (
+        <div className="p-4 text-center text-sm text-gray-500">
+          Không có dữ liệu địa điểm.
+        </div>
+      );
+    }
+
+    if (isLoading) {
+      return (
+        <div className="p-4 text-center text-sm text-gray-500">
+          Đang tải dữ liệu...
+        </div>
+      );
+    }
+
+    if (filteredPositions.length === 0) {
+      return (
+        <div className="p-4 text-center text-sm text-gray-500">
+          Không tìm thấy địa điểm phù hợp.
+        </div>
+      );
+    }
+
+    return filteredPositions.map((position) => (
+      <SuggestionItem
+        key={position.id || position.tenViTri}
+        position={position}
+        onSelect={() => {
+          form.setValue("location", position.tenViTri);
+          setShowSuggestions(false);
+          setShowLocationModal(false);
+        }}
+      />
+    ));
+  }, [filteredPositions, isLoading, positions.length, SuggestionItem, form, setShowSuggestions, setShowLocationModal]);
+
   return (
     <Dialog open={showLocationModal} onOpenChange={setShowLocationModal}>
       <DialogContent className="rounded-lg max-w-xl max-h-[80vh] overflow-y-none">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Bạn muốn đi đâu?
-          </DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Bạn muốn đi đâu?</DialogTitle>
           <DialogDescription className="text-gray-500 dark:text-white">
             Vui lòng chọn địa điểm bạn muốn đi
           </DialogDescription>
@@ -54,7 +185,10 @@ export const LocationDialog = ({
                       id="location-input"
                       placeholder="Tìm kiếm điểm đến"
                       onClick={() => setShowSuggestions(true)}
-                      onChange={(e) => field.onChange(e.target.value)}
+                      onChange={(e) => {
+                        field.onChange(e.target.value);
+                        handleInputChange(e.target.value);
+                      }}
                       onBlur={() => {
                         setTimeout(() => setShowSuggestions(false), 200);
                       }}
@@ -66,7 +200,10 @@ export const LocationDialog = ({
                         variant="ghost"
                         size="icon"
                         className="absolute top-1/2 right-2 -translate-y-1/2 transform rounded-full"
-                        onClick={() => form.setValue("location", "")}
+                        onClick={() => {
+                          form.setValue("location", "");
+                          setSearchValue("");
+                        }}
                       >
                         <X />
                       </Button>
@@ -77,6 +214,7 @@ export const LocationDialog = ({
               </FormItem>
             )}
           />
+
           <AnimatePresence>
             {showSuggestions && (
               <motion.div
@@ -86,44 +224,7 @@ export const LocationDialog = ({
                 transition={{ duration: 0.2 }}
                 className="absolute z-20 top-full left-0 w-full max-h-[34vh] overflow-x-hidden overflow-y-auto bg-white shadow-2xl"
               >
-                {positions.map((position, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    whileHover={{ scale: 1.02 }}
-                    className="flex cursor-pointer items-center p-3 hover:bg-gray-100"
-                    onClick={() => {
-                      form.setValue("location", position.tenViTri);
-                      setShowSuggestions(false);
-                      setShowLocationModal(false);
-                    }}
-                    role="link"
-                    tabIndex={0}
-                  >
-                    <div className="relative mr-3 h-12 w-12 overflow-hidden rounded-lg">
-                      <Image
-                        src={
-                          isValidUrl(position.hinhAnh)
-                            ? position.hinhAnh
-                            : "/placeholder.svg"
-                        }
-                        alt={position.tenViTri}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {position.tenViTri}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {position.tinhThanh}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
+                {SuggestionsList}
               </motion.div>
             )}
           </AnimatePresence>
@@ -211,18 +312,19 @@ export const DatePickerDialog = ({
                             new Date(new Date().setHours(0, 0, 0, 0))))
                       }
                       initialFocus
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:border-1 rounded-lg"
                       classNames={{
-                        caption: "flex justify-center items-center relative",
+                        caption: "flex justify-center items-center relative dark:text-white",
                         caption_label: "text-lg font-bold text-rose-500 cursor-default",
-                        nav: "flex items-center",
+                        nav: "flex items-center justify-center",
                         nav_button: "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 cursor-pointer",
                         nav_button_previous: "absolute left-2",
                         nav_button_next: "absolute right-2",
-                        head_cell: "text-red-500 font-bold flex items-center justify-center w-full py-2",
+                        head_cell: "text-red-500 font-bold flex items-center justify-center w-full py-2 ",
                         row: "flex gap-1 mt-1",
-                        day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100",
+                        day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700",
                         day_selected: "bg-rose-600 text-white hover:bg-rose-600 hover:text-white",
-                        day_today: "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50",
+                        day_today: "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:bg-gray-700 dark:text-white",
                       }}
                     />
                   </PopoverContent>

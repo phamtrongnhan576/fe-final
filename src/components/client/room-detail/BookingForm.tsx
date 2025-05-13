@@ -4,7 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { showSuccessToast } from '@/lib/client/services/notificationService';
+import { createBooking } from '@/lib/client/services/apiService';
+import { handleApiError, showErrorToast } from '@/lib/client/services/notificationService';
+import { RootState } from '@/lib/client/store/store';
 import { Comment, Room } from '@/lib/client/types/types';
+import { AxiosError } from 'axios';
 import { bookingSchema } from '@/lib/client/validator/validatior';
 import { formatDate } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,6 +17,7 @@ import { CalendarIcon, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm, useFormContext, UseFormReturn } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 import { z } from 'zod';
 
 type BookingFormProps = {
@@ -29,6 +35,7 @@ type PriceSummaryProps = {
 export default function BookingForm({ room, comments }: BookingFormProps) {
   const pricePerNight = room.giaTien;
   const cleaningFee = 8;
+  const user = useSelector((state: RootState) => state.user);
 
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
@@ -62,13 +69,31 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
   const total = pricePerNight * nights + cleaningFee;
 
 
-  const onSubmit = (data: z.infer<typeof bookingSchema>) => {
-    console.log('Booking data:', data);
+  const onSubmit = async (data: z.infer<typeof bookingSchema>) => {
+    try {
+      if (!user.id) {
+        showErrorToast("Vui lòng đăng nhập để đặt phòng");
+        return;
+      }
+      
+      const bookingData = {
+        ...data,
+        ngayDen: data.ngayDen.toISOString(),
+        ngayDi: data.ngayDi.toISOString(),
+        maNguoiDung: user.id,
+      };
+
+      await createBooking(bookingData);
+      showSuccessToast("Đặt phòng thành công");
+    } catch (error) {
+      console.log(error);
+      handleApiError(error as AxiosError);
+    }
   };
 
   return (
     <div className="space-y-6 sticky w-full lg:h-[350px] top-32 mb-10">
-      <div className="p-6 rounded-lg border-2 border-gray-300 space-y-6 shadow-xl">
+      <div className="p-6 rounded-lg border-2 border-gray-300 space-y-6 shadow-xl dark:bg-gray-800 dark:border-gray-700 dark:border-1">
         <div className="flex flex-wrap justify-between items-center gap-3">
           <div>
             <span className="font-bold">${pricePerNight}</span>/ night
@@ -76,8 +101,8 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
           <div>
             <span className="space-x-2 flex items-center justify-center">
               <Star className="text-rose-600" />
-              <span className="text-black font-bold">{calculateAverageRating()}</span>
-              <span className="underline cursor-pointer text-gray-600 hover:text-rose-600 duration-300">
+              <span className="text-black font-bold dark:text-white">{calculateAverageRating()}</span>
+              <span className="text-gray-600 hover:text-rose-600 duration-300 dark:text-white">
                 ({comments.length}) đánh giá
               </span>
             </span>
@@ -90,14 +115,14 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
             <GuestCounter form={form} />
             <Button
               type="submit"
-              className="bg-rose-600 w-full py-3 rounded-lg font-bold text-white hover:bg-rose-700"
+              className="bg-rose-600 w-full py-3 rounded-lg font-bold text-white hover:bg-rose-700 cursor-pointer"
             >
               Kiểm tra tình trạng còn phòng
             </Button>
           </form>
         </Form>
 
-        <p className="text-center text-gray-400">Bạn vẫn chưa bị trừ tiền</p>
+        <p className="text-center text-gray-400 dark:text-white">Bạn vẫn chưa bị trừ tiền</p>
         <PriceSummary
           price={pricePerNight}
           nights={nights}
@@ -112,11 +137,11 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
           aria-hidden="true"
           role="presentation"
           focusable="false"
-          className="h-4 w-4 fill-current"
+          className="h-4 w-4 fill-current dark:text-white"
         >
           <path d="m7.5011 1c.5272 0 .9591.40794.99725.92537l.00275.07463v1h5.5c.31265 0 .5435.281645.4935.581075l-.01275.056285-.96125 3.36264.96125 3.36265c.08055.2818-.0967.5625-.36775.62465l-.0554.00945-.0576.00325h-5.5c-.5272 0-.9591-.40795-.99725-.92535l-.00275-.07465v-1h-5v6h-1v-14zm1 3h-1v4h1z" />
         </svg>
-        <Link href="/" className="underline hover:text-rose-600">
+        <Link href="/under-dev" className="underline hover:text-rose-600 dark:text-white">
           Báo cáo nhà/phòng cho thuê này
         </Link>
       </div>
@@ -130,7 +155,7 @@ function DatePicker() {
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
 
   return (
-    <div className="grid grid-cols-2 gap-2 border-b pb-4">
+    <div className="grid grid-cols-2 gap-2 border-b pb-4 dark:border-gray-500">
       <div>
         <label className="text-sm font-medium">Nhận phòng</label>
         <FormField
@@ -143,10 +168,10 @@ function DatePicker() {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-start items-center rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50"
+                      className="w-full justify-start items-center rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50 cursor-pointer"
                     >
-                      <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
-                      <span className="text-gray-700">
+                      <CalendarIcon className="mr-3 h-5 w-5 text-gray-500 dark:text-white" />
+                      <span className="text-gray-700 dark:text-white">
                         {field.value ? formatDate(field.value) : 'Chọn ngày nhận phòng'}
                       </span>
                     </Button>
@@ -161,6 +186,27 @@ function DatePicker() {
                       }}
                       disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                       initialFocus
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:border-1 rounded-lg"
+                      classNames={{
+                        // Header (caption)
+                        caption: "flex justify-center items-center relative",
+                        caption_label: "text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default",
+                        // Navigation buttons (Previous/Next)
+                        nav: "flex items-center",
+                        nav_button: "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer",
+                        nav_button_previous: "absolute left-2",
+                        nav_button_next: "absolute right-2",
+                        // Weekday headers (Mon, Tue,...)
+                        head_cell: "text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2",
+                        // Calendar grid
+                        row: "flex gap-1 mt-1",
+                        // Normal day
+                        day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700",
+                        // Selected day
+                        day_selected: "bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800",
+                        // Today
+                        day_today: "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700",
+                      }}
                     />
                   </PopoverContent>
                 </Popover>
@@ -182,10 +228,10 @@ function DatePicker() {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-start items-center rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50"
+                      className="w-full justify-start items-center rounded-lg border-gray-300 py-3 pl-3 text-left hover:bg-gray-50 cursor-pointer"
                     >
-                      <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
-                      <span className="text-gray-700">
+                      <CalendarIcon className="mr-3 h-5 w-5 text-gray-500 dark:text-white" />
+                      <span className="text-gray-700 dark:text-white">
                         {field.value ? formatDate(field.value) : 'Chọn ngày trả phòng'}
                       </span>
                     </Button>
@@ -202,6 +248,27 @@ function DatePicker() {
                         date <= form.watch('ngayDen') || date < new Date(new Date().setHours(0, 0, 0, 0))
                       }
                       initialFocus
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:border-1 rounded-lg"
+                      classNames={{
+                        // Header (caption)
+                        caption: "flex justify-center items-center relative",
+                        caption_label: "text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default",
+                        // Navigation buttons (Previous/Next)
+                        nav: "flex items-center",
+                        nav_button: "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer",
+                        nav_button_previous: "absolute left-2",
+                        nav_button_next: "absolute right-2",
+                        // Weekday headers (Mon, Tue,...)
+                        head_cell: "text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2",
+                        // Calendar grid
+                        row: "flex gap-1 mt-1",
+                        // Normal day
+                        day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700",
+                        // Selected day
+                        day_selected: "bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800",
+                        // Today
+                        day_today: "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700",
+                      }}
                     />
                   </PopoverContent>
                 </Popover>
@@ -229,7 +296,7 @@ function GuestCounter({ form }: { form: UseFormReturn<z.infer<typeof bookingSche
               <div className="flex justify-between items-center">
                 <Button
                   type="button"
-                  className="w-9 h-9 bg-rose-600 hover:bg-rose-700 rounded-full"
+                  className="w-9 h-9 bg-rose-600 hover:bg-rose-700 rounded-full dark:text-white cursor-pointer"
                   onClick={() => field.value > 1 && field.onChange(field.value - 1)}
                 >
                   –
@@ -237,7 +304,7 @@ function GuestCounter({ form }: { form: UseFormReturn<z.infer<typeof bookingSche
                 <span>{field.value} khách</span>
                 <Button
                   type="button"
-                  className="w-9 h-9 bg-rose-600 hover:bg-rose-700 rounded-full"
+                  className="w-9 h-9 bg-rose-600 hover:bg-rose-700 rounded-full dark:text-white cursor-pointer"
                   onClick={() => field.value < maxGuests && field.onChange(field.value + 1)}
                 >
                   +
@@ -256,14 +323,14 @@ function PriceSummary({ price, nights, cleaningFee, total }: PriceSummaryProps) 
   return (
     <>
       <div className="flex justify-between items-center">
-        <p className="underline text-base">${price} X {nights} nights</p>
+        <p className="text-base">${price} X {nights} nights</p>
         <p className="font-mono text-lg font-bold">${price * nights}</p>
       </div>
       <div className="flex justify-between items-center">
-        <p className="underline text-base">Cleaning fee</p>
+        <p className="text-base">Cleaning fee</p>
         <p className="font-mono text-lg font-bold">${cleaningFee}</p>
       </div>
-      <div className="mb-5 w-full h-px bg-gray-300"></div>
+      <div className="mb-5 w-full h-px bg-gray-300 dark:bg-gray-500"></div>
       <div className="flex justify-between items-center">
         <p className="font-bold text-lg">Total before taxes</p>
         <p className="font-mono text-lg font-bold">${total}</p>

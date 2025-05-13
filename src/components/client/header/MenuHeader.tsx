@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AnimatePresence, motion } from "framer-motion";
@@ -18,7 +18,7 @@ import { useState } from "react";
 import { signIn, signUp } from "@/lib/client/services/apiService";
 import { handleApiError, showSuccessToast } from "@/lib/client/services/notificationService";
 import { AxiosError } from "axios";
-import { convertToISODate }  from "@/lib/utils";
+import { convertToISODate } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { clearUser, setUser } from "@/lib/client/store/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,7 +36,9 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
   const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
+
   const userName = user.name;
+  const userAvatar = user.avatar;
 
   const formSignIn = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -129,9 +131,13 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
               className="flex items-center gap-2 rounded-full hover:bg-transparent dark:hover:bg-transparent transition-colors px-3 py-1 cursor-pointer"
             >
               <Avatar className="!h-8 !w-8">
-                <AvatarFallback className="bg-gradient-to-br from-rose-300 to-rose-500">
-                  <User className="text-white h-4 w-4" />
-                </AvatarFallback>
+                {userAvatar ? (
+                  <AvatarImage src={userAvatar} />
+                ) : (
+                  <AvatarFallback className="bg-gradient-to-br from-rose-300 to-rose-500">
+                    <User className="text-white h-4 w-4" />
+                  </AvatarFallback>
+                )}
               </Avatar>
               <span className="font-medium text-sm text-white">
                 {userName || "Tài khoản"}
@@ -150,13 +156,13 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 {userName ? (
                   <>
                     <Link
-                      href="/profile"
+                      href="/under-dev"
                       className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
                       Trang cá nhân
                     </Link>
                     <Link
-                      href="/settings"
+                      href="/under-dev"
                       className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
                       Cài đặt
@@ -373,7 +379,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                         <FormLabel>Ngày sinh</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Nhập ngày sinh (DD/MM/YYYY)"
+                            placeholder="DD/MM/YYYY"
                             {...field}
                             value={field.value || ""}
                             onChange={(e) => {
@@ -399,7 +405,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                           value={field.value === undefined ? undefined : field.value ? "true" : "false"}
                         >
                           <FormControl>
-                            <SelectTrigger className="rounded-lg cursor-pointer w-full">
+                            <SelectTrigger className="rounded-lg cursor-pointer w-full text-md">
                               <SelectValue placeholder="Chọn giới tính" />
                             </SelectTrigger>
                           </FormControl>
