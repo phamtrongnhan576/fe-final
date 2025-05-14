@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import ProviderRedux from "@/lib/client/store/StoreProvider"
 
@@ -20,19 +19,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className}`} suppressHydrationWarning>
-       
-          <ProviderRedux>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster />
-            </ThemeProvider>
-          </ProviderRedux>
-       
+        <ProviderRedux>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </ProviderRedux>
       </body>
     </html>
   );

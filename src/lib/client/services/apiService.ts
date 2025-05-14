@@ -1,5 +1,6 @@
 import axiosInstance from "./axiosInstance";
-import { Comment, defaultRoom, Position, PostComment, Room, SignIn, SignUp, User, Booking } from "../types/types";
+import { Comment, defaultRoom, Position, PostComment, Room, SignIn, SignUp, User, Booking, Coordinates } from "../types/types";
+import axios from "axios";
 
 export async function fetchPosition(): Promise<Position[]> {
   try {
@@ -74,14 +75,42 @@ export async function createBooking(data: Booking): Promise<void> {
   }
 }
 
+export async function getCoordinatesByCity(city: string): Promise<Coordinates> {
+  try {
+    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+      params: {
+        q: city,
+        format: 'json',
+        limit: 1,
+        countrycodes: 'vn',
+      }
+    });
+
+    if (!response.data || response.data.length === 0) {
+      throw new Error('Không tìm thấy thành phố');
+    }
+
+    const result = response.data[0];
+    return {
+      latitude: parseFloat(result.lat),
+      longitude: parseFloat(result.lon),
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function signIn(data: SignIn): Promise<{ token: string; user: User }> {
   try {
     const response = await axiosInstance.post(`/api/auth/signin`, data);
 
     if (response.statusText === "OK") {
       const token = response.data.content.token;
-      localStorage.setItem("authToken", token);
       const user = response.data.content.user;
+      
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("user", JSON.stringify(user));
+    
       return { token, user };
     } else {
       throw new Error(response.data.message || "Không thể đăng nhập");

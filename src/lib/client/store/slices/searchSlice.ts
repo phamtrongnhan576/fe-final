@@ -28,9 +28,15 @@ const searchSlice = createSlice({
       state.checkIn = action.payload.checkIn;
       state.checkOut = action.payload.checkOut;
     },
+    clearSearch: (state) => {
+      state.location = "";
+      state.guests = 1;
+      state.checkIn = today.toISOString();
+      state.checkOut = checkOutDate.toISOString();
+    },
   },
 });
 
-export const { setSearch } = searchSlice.actions;
+export const { setSearch, clearSearch } = searchSlice.actions;
 
 export default searchSlice.reducer;

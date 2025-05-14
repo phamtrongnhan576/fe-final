@@ -4,14 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
 import { listHomeRooms } from '@/lib/client/types/dataTypes';
-import { useEffect } from 'react';
-import AOS from 'aos';
 
 export default function HomeRooms() {
-  useEffect(() => {
-    AOS.init();
-  }, []);
-
   return (
     <div className="max-w-md md:container mx-auto space-y-6 pt-8 pb-20">
       <h1 className="font-bold text-3xl text-gray-800 dark:text-gray-100">

@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/form";
 import { searchSchema } from "@/lib/client/validator/validatior";
 import { LocationDialog, CheckInDialog, CheckOutDialog, GuestDialog } from "./searchDialog";
-import { toast } from "sonner"
 import { useRouter } from "next/navigation";
 import { showErrorToast, showSuccessToast } from "@/lib/client/services/notificationService";
 import { useDispatch, useSelector } from "react-redux";
@@ -58,7 +57,6 @@ export default function SearchPanel() {
 
     showSuccessToast("Đang tìm kiếm ...")
 
-
     router.push(`/rooms/${selectedPosition.slug}`);
   };
 
@@ -72,21 +70,10 @@ export default function SearchPanel() {
     if (errors.guests) errorMessages.push(errors.guests.message);
 
     if (errorMessages.length > 0) {
-      toast.error("Vui lòng kiểm tra các lỗi sau:", {
-        description: (
-          <ul className="list-disc space-y-1 pl-5 mt-2">
-            {errorMessages.map((msg, index) => (
-              <li key={`error-${index}`} className="text-sm text-red-600">
-                {msg}
-              </li>
-            ))}
-          </ul>
-        ),
-        duration: 2000,
-        className: "!bg-red-50 !text-red-600 !font-bold !border-[3px] !text-lg !border-red-500",
-        icon: " ",
-        position: "top-right",
-      });
+      showErrorToast("Vui lòng kiểm tra các lỗi sau:")
+      errorMessages.forEach((msg) => {
+        showErrorToast(msg || "Lỗi không xác định")
+      })
     }
   };
 

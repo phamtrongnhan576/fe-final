@@ -16,10 +16,10 @@ export default function RoomDetails() {
     <>
       <div className="flex justify-between items-center">
         <div className="space-y-3">
-          <h3 className="text-xl font-bold">
+          <h3 className="text-lg sm:text-xl font-bold">
             Toàn bộ căn hộ. Chủ nhà <span className="underline uppercase">nnhatsang</span>
           </h3>
-          <p>3 Khách • Phòng Studio • 1 Phòng ngủ • 1 giường • 1 Phòng tắm</p>
+          <p className='text-md sm:text-base'>3 Khách • Phòng Studio • 1 Phòng ngủ • 1 giường • 1 Phòng tắm</p>
         </div>
         <div className="relative">
           <Image
@@ -69,7 +69,7 @@ export default function RoomDetails() {
           <span>Dịch sang tiếng Anh</span>
           <FaLanguage className="!w-12 !h-12" />
         </button>
-        <p className="text-justify py-3">
+        <p className="text-justify py-3 text-md sm:text-base">
           Tự nhận phòng<br />
           Tự nhận phòng bằng khóa thông minh.<br />
           Dinh Long là Chủ nhà siêu cấp<br />

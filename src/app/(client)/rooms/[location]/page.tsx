@@ -13,6 +13,7 @@ export default function RoomsPage() {
   const params = useParams();
   const { location } = params;
 
+
   const positions = useSelector((state: RootState) => state.position);
 
   const position = positions.find((pos) => pos.slug === location)

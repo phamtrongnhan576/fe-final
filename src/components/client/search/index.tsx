@@ -16,7 +16,7 @@ const Search = () => {
   const dispatch = useDispatch();
 
   const { data, error, isLoading } = useApi("/api/vi-tri", () => fetchPosition());
-
+  
   useEffect(() => {
     if (data) {
       const positions: PositionWithSlug[] = data.map((position: Position) => ({

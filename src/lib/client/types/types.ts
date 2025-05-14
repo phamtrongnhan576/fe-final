@@ -105,3 +105,8 @@ export interface Booking {
   soLuongKhach: number;
   maNguoiDung: number;
 }
+
+export interface Coordinates {
+  latitude: number;
+  longitude: number;
+}

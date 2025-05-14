@@ -13,7 +13,7 @@ import { AxiosError } from 'axios';
 import { bookingSchema } from '@/lib/client/validator/validatior';
 import { formatDate } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CalendarIcon, Star } from 'lucide-react';
+import { CalendarIcon, Minus, Plus, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm, useFormContext, UseFormReturn } from 'react-hook-form';
@@ -299,7 +299,7 @@ function GuestCounter({ form }: { form: UseFormReturn<z.infer<typeof bookingSche
                   className="w-9 h-9 bg-rose-600 hover:bg-rose-700 rounded-full dark:text-white cursor-pointer"
                   onClick={() => field.value > 1 && field.onChange(field.value - 1)}
                 >
-                  –
+                  <Minus />
                 </Button>
                 <span>{field.value} khách</span>
                 <Button
@@ -307,7 +307,7 @@ function GuestCounter({ form }: { form: UseFormReturn<z.infer<typeof bookingSche
                   className="w-9 h-9 bg-rose-600 hover:bg-rose-700 rounded-full dark:text-white cursor-pointer"
                   onClick={() => field.value < maxGuests && field.onChange(field.value + 1)}
                 >
-                  +
+                  <Plus />
                 </Button>
               </div>
             </FormControl>

@@ -11,7 +11,7 @@ export default function RoomHeader({ room }: { room: Room }) {
   return (
     <>
       {/* Room title */}
-      <h2 className="font-bold text-3xl pt-4">
+      <h2 className="font-bold text-xl sm:text-3xl pt-4 ">
         {room.tenPhong || "NewApt D1 - Cozy studio - NU apt - 500m Bui Vien!"}
       </h2>
 

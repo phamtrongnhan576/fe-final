@@ -99,3 +99,16 @@ export const formatDateTime = (dateInput: Date) => {
 export const sortCommentsByIdDescending = (comments: Comment[]): Comment[] => {
   return [...comments].sort((a, b) => b.id - a.id);
 };
+
+export const concatDevice = (mayGiat: boolean, banLa: boolean, tivi: boolean, dieuHoa: boolean, wifi: boolean, bep: boolean, doXe: boolean, banUi: boolean) => {
+  const listDevice = [];
+  if (mayGiat) listDevice.push("Máy giặt");
+  if (banLa) listDevice.push("Bàn là");
+  if (tivi) listDevice.push("Tivi");
+  if (dieuHoa) listDevice.push("Điều hòa");
+  if (wifi) listDevice.push("Wifi");
+  if (bep) listDevice.push("Bếp");
+  if (doXe) listDevice.push("Đỗ xe");
+  if (banUi) listDevice.push("Bàn ủi");
+  return listDevice.join(' • ');
+};

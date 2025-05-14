@@ -20,9 +20,9 @@ import { handleApiError, showSuccessToast } from "@/lib/client/services/notifica
 import { AxiosError } from "axios";
 import { convertToISODate } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { clearUser, setUser } from "@/lib/client/store/slices/userSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/lib/client/store/store";
+import { clearUser } from "@/lib/client/store/slices/userSlice";
+import { useDispatch } from "react-redux";
+import { clearSearch } from "@/lib/client/store/slices/searchSlice";
 
 type MenuHeaderProps = {
   visible: boolean;
@@ -35,10 +35,12 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user);
 
-  const userName = user.name;
-  const userAvatar = user.avatar;
+  const userLocalStorage = localStorage.getItem("user");
+  const userParsed = userLocalStorage ? JSON.parse(userLocalStorage) : null;
+
+  const userName = userParsed?.name;
+  const userAvatar = userParsed?.avatar;
 
   const formSignIn = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -63,7 +65,8 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
   const onSubmitFormSignIn = async (data: z.infer<typeof signInSchema>) => {
     try {
       const res = await signIn(data);
-      dispatch(setUser(res.user));
+
+
 
       if (res.token) {
         showSuccessToast("Đăng nhập thành công!");
@@ -102,7 +105,12 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
 
   const handleLogout = () => {
     dispatch(clearUser());
+
     localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+
+    dispatch(clearSearch());
+
     showSuccessToast("Đăng xuất thành công!");
   };
 
