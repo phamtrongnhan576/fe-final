@@ -5,10 +5,11 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { useState } from "react";
-
+import { useTranslations } from "next-intl";
 export default function Banner() {
   const { theme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
+  const t = useTranslations("Banner");
 
   useEffect(() => {
     setIsMounted(true);
@@ -33,13 +34,16 @@ export default function Banner() {
 
       <div className="absolute container mx-auto px-4 md:px-10 h-full flex justify-center flex-col items-center md:items-start gap-2 md:gap-4">
         <div className="flex items-center">
-          <Image
-            src="/airbnb-1.svg"
-            alt="Airbnb logo"
-            width={56}
-            height={56}
-            className="w-10 md:w-14 md:mr-4 mr-2"
-          />
+          <div className="relative w-10 h-10 md:w-14 md:mr-4 mr-2">
+            <Image
+              src="/airbnb-1.svg"
+              alt="Airbnb logo"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+            />
+          </div>
+
           <motion.h2
             className="text-3xl md:text-5xl lg:text-7xl text-custom-rose font-bold transition-colors duration-200 cursor-default"
             initial={{ opacity: 0, y: 40 }}
@@ -55,7 +59,7 @@ export default function Banner() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          Belong anywhere
+          {t("Belong anywhere")}
         </motion.p>
       </div>
       <div className="absolute bottom-0 w-full">

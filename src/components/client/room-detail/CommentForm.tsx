@@ -16,12 +16,14 @@ import { AxiosError } from 'axios';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/client/store/store';
+import { useTranslations } from 'next-intl';
 
 export default function CommentForm({ id }: { id: number }) {
   const user = useSelector((state: RootState) => state.user);
   const userAvatar = user.avatar;
   const userName = user.name;
-  
+  const t = useTranslations("RoomDetail");
+
   const form = useForm<z.infer<typeof commentSchema>>({
     resolver: zodResolver(commentSchema),
     defaultValues: {
@@ -54,7 +56,7 @@ export default function CommentForm({ id }: { id: number }) {
           )}
         </Avatar>
         <span className="font-semibold text-sm text-gray-600 dark:text-white">
-          {userName || "Tài khoản"}
+          {userName || t("comment.defaultUsername")}
         </span>
       </div>
 
@@ -83,7 +85,7 @@ export default function CommentForm({ id }: { id: number }) {
                 <FormItem className="flex-1">
                   <FormControl>
                     <Textarea
-                      placeholder="Nhập bình luận ..."
+                      placeholder={t("comment.placeholder")}
                       className="min-h-20 max-h-60"
                       {...field}
                     />
@@ -97,7 +99,7 @@ export default function CommentForm({ id }: { id: number }) {
                 type="submit"
                 className="px-5 py-2 rounded-lg bg-rose-600 text-white duration-200 hover:bg-rose-700 cursor-pointer"
               >
-                Đánh giá
+                {t("comment.submitButton")}
               </Button>
             </div>
           </form>

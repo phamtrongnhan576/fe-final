@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { clearUser } from "@/lib/client/store/slices/userSlice";
 import { useDispatch } from "react-redux";
 import { clearSearch } from "@/lib/client/store/slices/searchSlice";
+import { useTranslations } from "next-intl";
 
 type MenuHeaderProps = {
   visible: boolean;
@@ -34,6 +35,8 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
     useMenuDropdown();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
+  const t = useTranslations("Header");
+  const tToast = useTranslations("Toast");
   const dispatch = useDispatch();
 
   const userLocalStorage = localStorage.getItem("user");
@@ -66,10 +69,8 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
     try {
       const res = await signIn(data);
 
-
-
       if (res.token) {
-        showSuccessToast("Đăng nhập thành công!");
+        showSuccessToast(tToast("Login success"));
         setShowModal(false);
       }
     } catch (error) {
@@ -84,7 +85,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
         birthday: data.birthday ? convertToISODate(data.birthday) : undefined,
       };
       await signUp(formattedData);
-      showSuccessToast("Đăng ký thành công!");
+      showSuccessToast(tToast("Signup success"));
       setShowSignInModal(false);
     } catch (error) {
       handleApiError(error as AxiosError);
@@ -111,7 +112,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
 
     dispatch(clearSearch());
 
-    showSuccessToast("Đăng xuất thành công!");
+    showSuccessToast(tToast("Logout success"));
   };
 
   return (
@@ -148,7 +149,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 )}
               </Avatar>
               <span className="font-medium text-sm text-white">
-                {userName || "Tài khoản"}
+                {userName || t("Account")}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -167,13 +168,13 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                       href="/under-dev"
                       className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
-                      Trang cá nhân
+                      {t("Profile")}
                     </Link>
                     <Link
                       href="/under-dev"
                       className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
-                      Cài đặt
+                      {t("Settings")}
                     </Link>
                     <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                     <Button
@@ -181,7 +182,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                       className="w-full inline-block text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                       onClick={handleLogout}
                     >
-                      Đăng xuất
+                      {t("Logout")}
                     </Button>
                   </>
                 ) : (
@@ -191,14 +192,14 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                       onClick={handleOpenLoginModal}
                       className="w-full inline-block text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
-                      Đăng nhập
+                      {t("Login")}
                     </Button>
                     <Button
                       variant="ghost"
                       onClick={handleOpenSignupModal}
                       className="w-full inline-block text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
-                      Đăng ký
+                      {t("Signup")}
                     </Button>
                   </>
                 )}
@@ -227,9 +228,9 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="sm:max-w-lg rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center">Đăng nhập</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center">{t("Login")}</DialogTitle>
             <DialogDescription className="text-center">
-              Chào mừng bạn trở lại
+              {t("Welcome back")}
             </DialogDescription>
           </DialogHeader>
           <Form {...formSignIn}>
@@ -239,11 +240,11 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("Email")}</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Nhập email của bạn"
+                        placeholder={t("Enter email")}
                         {...field}
                         className="rounded-lg"
                       />
@@ -257,11 +258,11 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mật khẩu</FormLabel>
+                    <FormLabel>{t("Password")}</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Nhập mật khẩu"
+                        placeholder={t("Enter password")}
                         {...field}
                         className="rounded-lg"
                       />
@@ -275,13 +276,13 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                   type="submit"
                   className="w-full bg-rose-500 hover:bg-rose-600 rounded-lg py-2 cursor-pointer"
                 >
-                  Đăng nhập
+                  {t("Login")}
                 </Button>
               </div>
             </form>
           </Form>
           <div className="text-center text-sm">
-            Chưa có tài khoản?{" "}
+            {t("No account")}?{" "}
             <button
               type="button"
               className="text-rose-500 hover:underline cursor-pointer"
@@ -290,7 +291,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 setShowSignInModal(true);
               }}
             >
-              Đăng ký ngay
+              {t("Signup")}
             </button>
           </div>
         </DialogContent>
@@ -300,9 +301,9 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
       <Dialog open={showSignInModal} onOpenChange={setShowSignInModal}>
         <DialogContent className="sm:max-w-lg rounded-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center">Đăng ký tài khoản</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center">{t("Signup account")}</DialogTitle>
             <DialogDescription className="text-center">
-              Tạo tài khoản mới của bạn
+              {t("Create account")}
             </DialogDescription>
           </DialogHeader>
           <Form {...formSignUp}>
@@ -312,10 +313,10 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Họ và tên</FormLabel>
+                    <FormLabel>{t("Name")}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Nhập họ tên đầy đủ"
+                        placeholder={t("Enter name")}
                         {...field}
                         className="rounded-lg"
                       />
@@ -329,11 +330,11 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("Email")}</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Nhập email của bạn"
+                        placeholder={t("Enter email")}
                         {...field}
                         className="rounded-lg"
                       />
@@ -347,11 +348,11 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mật khẩu</FormLabel>
+                    <FormLabel>{t("Password")}</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Tạo mật khẩu"
+                        placeholder={t("Enter password")}
                         {...field}
                         className="rounded-lg"
                       />
@@ -365,10 +366,10 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Số điện thoại</FormLabel>
+                    <FormLabel>{t("Phone")}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Nhập số điện thoại"
+                        placeholder={t("Enter phone")}
                         {...field}
                         className="rounded-lg"
                       />
@@ -384,7 +385,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                     name="birthday"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ngày sinh</FormLabel>
+                        <FormLabel>{t("Birthday")}</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="DD/MM/YYYY"
@@ -407,7 +408,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                     name="gender"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Giới tính</FormLabel>
+                        <FormLabel>{t("Gender")}</FormLabel>
                         <Select
                           onValueChange={(value) => field.onChange(value === "true")}
                           value={field.value === undefined ? undefined : field.value ? "true" : "false"}
@@ -418,8 +419,8 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="true" className="cursor-pointer">Nam</SelectItem>
-                            <SelectItem value="false" className="cursor-pointer">Nữ</SelectItem>
+                            <SelectItem value="true" className="cursor-pointer">{t("Male")}</SelectItem>
+                            <SelectItem value="false" className="cursor-pointer">{t("Female")}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage className="text-xs text-red-500" />
@@ -432,12 +433,12 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 type="submit"
                 className="w-full bg-rose-500 hover:bg-rose-600 rounded-lg py-2 cursor-pointer"
               >
-                Đăng ký
+                {t("Signup")}
               </Button>
             </form>
           </Form>
           <div className="text-center text-sm">
-            Đã có tài khoản?{" "}
+            {t("Have account")}?{" "}
             <button
               type="button"
               className="text-rose-500 hover:underline cursor-pointer"
@@ -446,7 +447,7 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                 setShowModal(true);
               }}
             >
-              Đăng nhập ngay
+              {t("Login now")}
             </button>
           </div>
         </DialogContent>

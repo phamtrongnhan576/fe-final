@@ -5,7 +5,7 @@ import { formatDateTime, isValidUrl } from "@/lib/utils";
 import Image from "next/image";
 import { Star } from 'lucide-react';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-
+import { useTranslations } from "next-intl";
 interface CommentsSectionProps {
   comments: Comment[];
 }
@@ -16,6 +16,7 @@ export default function CommentsSection({ comments }: CommentsSectionProps) {
   const totalPages = Math.ceil(comments.length / commentsPerPage);
   const startIndex = (currentPage - 1) * commentsPerPage;
   const paginatedComments = comments.slice(startIndex, startIndex + commentsPerPage);
+  const t = useTranslations("RoomDetail");
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -25,14 +26,14 @@ export default function CommentsSection({ comments }: CommentsSectionProps) {
 
   return (
     <div>
-      <h3 className="font-bold text-xl mb-4">Bình luận</h3>
+      <h3 className="font-bold text-xl mb-4">{t("comments.title")}</h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 px-2 h-80 overflow-y-auto">
         {paginatedComments.map((comment: Comment, index: number) => (
           <div key={index} className="space-y-3">
             <div className="flex items-center gap-3">
               <div>
                 <Image
-                  alt="User avatar"
+                  alt={t("comments.userAvatarAlt")}
                   className="w-12 h-12 rounded-full object-cover"
                   width={48}
                   height={48}

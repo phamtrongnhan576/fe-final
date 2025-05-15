@@ -17,7 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { formatDate } from "@/lib/utils";
 import { useState, useMemo, useCallback } from "react";
 import { useDebounce } from "react-use";
-
+import { useTranslations } from "next-intl";
 export const LocationDialog = ({
   showLocationModal,
   setShowLocationModal,
@@ -36,6 +36,7 @@ export const LocationDialog = ({
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const t = useTranslations("Search");
 
   const normalizeText = useCallback(
     (text: string) => text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase(),
@@ -129,7 +130,7 @@ export const LocationDialog = ({
     if (positions.length === 0) {
       return (
         <div className="p-4 text-center text-sm text-gray-500">
-          Không có dữ liệu địa điểm.
+          {t("No data")}
         </div>
       );
     }
@@ -137,7 +138,7 @@ export const LocationDialog = ({
     if (isLoading) {
       return (
         <div className="p-4 text-center text-sm text-gray-500">
-          Đang tải dữ liệu...
+          {t("Loading")}
         </div>
       );
     }
@@ -145,7 +146,7 @@ export const LocationDialog = ({
     if (filteredPositions.length === 0) {
       return (
         <div className="p-4 text-center text-sm text-gray-500">
-          Không tìm thấy địa điểm phù hợp.
+          {t("No data")}
         </div>
       );
     }
@@ -161,15 +162,15 @@ export const LocationDialog = ({
         }}
       />
     ));
-  }, [filteredPositions, isLoading, positions.length, SuggestionItem, form, setShowSuggestions, setShowLocationModal]);
+  }, [filteredPositions, isLoading, positions.length, SuggestionItem, form, setShowSuggestions, setShowLocationModal, t]);
 
   return (
     <Dialog open={showLocationModal} onOpenChange={setShowLocationModal}>
       <DialogContent className="rounded-lg max-w-xl max-h-[80vh] overflow-y-none">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Bạn muốn đi đâu?</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">{t("Where do you want to go?")}</DialogTitle>
           <DialogDescription className="text-gray-500 dark:text-white">
-            Vui lòng chọn địa điểm bạn muốn đi
+            {t("Please select the location you want to go")}
           </DialogDescription>
         </DialogHeader>
         <div className="relative">
@@ -183,7 +184,7 @@ export const LocationDialog = ({
                     <Input
                       {...field}
                       id="location-input"
-                      placeholder="Tìm kiếm điểm đến"
+                      placeholder={t("Search location")}
                       onClick={() => setShowSuggestions(true)}
                       onChange={(e) => {
                         field.onChange(e.target.value);
@@ -234,16 +235,15 @@ export const LocationDialog = ({
   );
 };
 
-// Định nghĩa kiểu cho props của DatePickerDialog
 interface DatePickerDialogProps {
   open: boolean;
   onOpenChange: (value: boolean) => void;
   form: ReturnType<typeof useForm<z.infer<typeof searchSchema>>>;
-  fieldName: "checkIn" | "checkOut"; // Trường trong form
-  title: string; // Tiêu đề dialog
-  description: string; // Mô tả dialog
-  autoClose?: boolean; // Tự động đóng sau khi chọn ngày
-  disabledDate?: (date: Date) => boolean; // Hàm tùy chỉnh để vô hiệu hóa ngày
+  fieldName: "checkIn" | "checkOut";
+  title: string;
+  description: string;
+  autoClose?: boolean;
+  disabledDate?: (date: Date) => boolean;
 }
 
 export const DatePickerDialog = ({
@@ -257,6 +257,7 @@ export const DatePickerDialog = ({
   disabledDate,
 }: DatePickerDialogProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const t = useTranslations("Search");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -286,7 +287,7 @@ export const DatePickerDialog = ({
                       <span className="text-gray-700 dark:text-white">
                         {field.value
                           ? formatDate(field.value)
-                          : "Chưa chọn ngày"}
+                          : t("Not selected date")}
                       </span>
                     </Button>
                   </PopoverTrigger>
@@ -347,20 +348,23 @@ export const CheckInDialog = ({
   showCheckInModal: boolean;
   setShowCheckInModal: (value: boolean) => void;
   form: ReturnType<typeof useForm<z.infer<typeof searchSchema>>>;
-}) => (
-  <DatePickerDialog
-    open={showCheckInModal}
-    onOpenChange={setShowCheckInModal}
-    form={form}
-    fieldName="checkIn"
-    title="Chọn ngày nhận phòng"
-    description="Vui lòng chọn ngày bạn muốn nhận phòng"
-    autoClose={true}
-    disabledDate={(date) =>
-      date < new Date(new Date().setHours(0, 0, 0, 0))
-    }
-  />
-);
+}) => {
+  const t = useTranslations("Search");
+  return (
+    <DatePickerDialog
+      open={showCheckInModal}
+      onOpenChange={setShowCheckInModal}
+      form={form}
+      fieldName="checkIn"
+      title={t("Check in date")}
+      description={t("Please select the date you want to check in")}
+      autoClose={true}
+      disabledDate={(date) =>
+        date < new Date(new Date().setHours(0, 0, 0, 0))
+      }
+    />
+  );
+};
 
 export const CheckOutDialog = ({
   showCheckOutModal,
@@ -370,21 +374,24 @@ export const CheckOutDialog = ({
   showCheckOutModal: boolean;
   setShowCheckOutModal: (value: boolean) => void;
   form: ReturnType<typeof useForm<z.infer<typeof searchSchema>>>;
-}) => (
-  <DatePickerDialog
-    open={showCheckOutModal}
-    onOpenChange={setShowCheckOutModal}
-    form={form}
-    fieldName="checkOut"
-    title="Chọn ngày trả phòng"
-    description="Vui lòng chọn ngày bạn muốn trả phòng"
-    autoClose={true}
-    disabledDate={(date) =>
-      date <=
-      (form.watch("checkIn") || new Date(new Date().setHours(0, 0, 0, 0)))
-    }
-  />
-);
+}) => {
+  const t = useTranslations("Search");
+  return (
+    <DatePickerDialog
+      open={showCheckOutModal}
+      onOpenChange={setShowCheckOutModal}
+      form={form}
+      fieldName="checkOut"
+      title={t("Check out date")}
+      description={t("Please select the date you want to check out")}
+      autoClose={true}
+      disabledDate={(date) =>
+        date <=
+        (form.watch("checkIn") || new Date(new Date().setHours(0, 0, 0, 0)))
+      }
+    />
+  );
+};
 
 export const GuestDialog = ({
   showGuestModal,
@@ -395,15 +402,16 @@ export const GuestDialog = ({
   setShowGuestModal: (value: boolean) => void;
   form: ReturnType<typeof useForm<z.infer<typeof searchSchema>>>;
 }) => {
+  const t = useTranslations("Search");
   return (
     <Dialog open={showGuestModal} onOpenChange={setShowGuestModal}>
       <DialogContent className="rounded-lg border-0 p-0 shadow-xl sm:max-w-lg">
         <DialogHeader className="px-6 pt-6 pb-2">
           <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-white">
-            Chọn số lượng khách
+            {t("Select number of guests")}
           </DialogTitle>
           <DialogDescription className="text-gray-500 dark:text-white">
-            Đảm bảo chỗ ở phù hợp với số lượng khách của bạn
+            {t("Ensure the accommodation is suitable for the number of guests")}
           </DialogDescription>
         </DialogHeader>
 
@@ -415,9 +423,9 @@ export const GuestDialog = ({
               <FormItem>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Người lớn</p>
+                    <p className="font-medium">{t("Adult")}</p>
                     <p className="text-sm text-gray-500">
-                      Từ 13 tuổi trở lên
+                      {t("From 13 years old")}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">

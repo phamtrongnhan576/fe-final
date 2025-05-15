@@ -26,13 +26,12 @@ export default function RoomsPage() {
 
   const { data: rooms, error, isLoading } = useSWR(key, fetcher);
 
-  if (error) return <Error />;
-  if (!position) return <Error />;
   if (isLoading) return <Loading />;
+  if (error || !position || !rooms) return <Error />;
 
   return (
     <div>
-      <ListRoom rooms={rooms ?? []} position={position!} />
+      <ListRoom rooms={rooms} position={position!} />
     </div>
   );
 }

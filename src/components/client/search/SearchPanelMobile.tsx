@@ -29,7 +29,7 @@ import { useRouter } from "next/navigation";
 import { setSearch } from "@/lib/client/store/slices/searchSlice";
 import { showErrorToast, showSuccessToast } from "@/lib/client/services/notificationService";
 import { RootState } from "@/lib/client/store/store";
-
+import { useTranslations } from "next-intl";
 const SearchPanelMobile = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -39,6 +39,7 @@ const SearchPanelMobile = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const positions = useSelector((state: RootState) => state.position);
+  const t = useTranslations("Search");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -77,11 +78,11 @@ const SearchPanelMobile = () => {
     const selectedPosition = positions.find(pos => pos.tenViTri === data.location);
 
     if (!selectedPosition || !selectedPosition.tinhThanh) {
-      showErrorToast("Tìm kiếm thất bại!");
+      showErrorToast(t("Search failed"));
       return;
     };
 
-    showSuccessToast("Đang tìm kiếm ...")
+    showSuccessToast(t("Searching"))
 
     const slug = slugify(selectedPosition.tinhThanh);
     router.push(`/rooms/${slug}`);
@@ -100,7 +101,7 @@ const SearchPanelMobile = () => {
         }}
       >
         <Search className="h-5 w-5" />
-        <span className="text-sm font-medium">Bắt đầu tìm kiếm</span>
+        <span className="text-sm font-medium">{t("Start searching")}</span>
       </Button>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
@@ -108,7 +109,7 @@ const SearchPanelMobile = () => {
             <form onSubmit={form.handleSubmit(onSubmitForm)}>
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold">
-                  Tìm kiếm chỗ ở
+                  {t("Search accommodation")}
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-6">
@@ -118,12 +119,12 @@ const SearchPanelMobile = () => {
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Địa điểm</FormLabel>
+                      <FormLabel>{t("Location")}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <div className="relative">
                             <Input
-                              placeholder="Tìm kiếm điểm đến"
+                              placeholder={t("Search location")}
                               {...field}
                               onClick={(e) => {
                                 e.preventDefault();
@@ -214,7 +215,7 @@ const SearchPanelMobile = () => {
                   name="checkIn"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ngày nhận phòng</FormLabel>
+                      <FormLabel>{t("Check-in date")}</FormLabel>
                       <FormControl>
                         <Popover open={openCheckIn} onOpenChange={setOpenCheckIn}>
                           <PopoverTrigger asChild>
@@ -224,7 +225,7 @@ const SearchPanelMobile = () => {
                             >
                               <CalendarIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
                               <span className="ml-6 text-gray-700 dark:text-white">
-                                {field.value ? formatDate(field.value) : "Thêm ngày"}
+                                {field.value ? formatDate(field.value) : t("Add date")}
                               </span>
                             </Button>
                           </PopoverTrigger>
@@ -285,7 +286,7 @@ const SearchPanelMobile = () => {
                   name="checkOut"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ngày trả phòng</FormLabel>
+                      <FormLabel>{t("Check-out date")}</FormLabel>
                       <FormControl>
                         <Popover open={openCheckOut} onOpenChange={setOpenCheckOut}>
                           <PopoverTrigger asChild>
@@ -357,12 +358,12 @@ const SearchPanelMobile = () => {
                   name="guests"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Số khách</FormLabel>
+                      <FormLabel>{t("Number of guests")}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
-                            placeholder="Thêm khách"
-                            value={field.value > 0 ? `${field.value} khách` : ""}
+                            placeholder={t("Add guests")}
+                            value={field.value > 0 ? `${field.value} ${t("guests")}` : ""}
                             readOnly
                             className="w-full rounded-lg border-gray-300 py-5 pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-white placeholder:text-sm placeholder:text-gray-700"
                           />
@@ -411,7 +412,7 @@ const SearchPanelMobile = () => {
                   size="lg"
                 >
                   <Search className="mr-2 h-5 w-5" />
-                  Tìm kiếm
+                  {t("Search")}
                 </Button>
               </div>
             </form>

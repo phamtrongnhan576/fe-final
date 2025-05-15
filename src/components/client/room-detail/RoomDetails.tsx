@@ -3,6 +3,7 @@ import { MdIron } from 'react-icons/md';
 import { FaLanguage } from 'react-icons/fa';
 import Image from 'next/image';
 import { IconComponent } from '@/lib/client/types/dataTypes';
+import { useTranslations } from 'next-intl';
 
 type FeatureProps = {
   Icon: IconComponent;
@@ -12,19 +13,21 @@ type FeatureProps = {
 }
 
 export default function RoomDetails() {
+  const t = useTranslations("RoomDetail");
+
   return (
     <>
       <div className="flex justify-between items-center">
         <div className="space-y-3">
           <h3 className="text-lg sm:text-xl font-bold">
-            Toàn bộ căn hộ. Chủ nhà <span className="underline uppercase">nnhatsang</span>
+            {t("entireApartment")} <span className="underline uppercase">nnhatsang</span>
           </h3>
-          <p className='text-md sm:text-base'>3 Khách • Phòng Studio • 1 Phòng ngủ • 1 giường • 1 Phòng tắm</p>
+          <p className='text-md sm:text-base'>{t("roomSummary", { guests: 3 })}</p>
         </div>
         <div className="relative">
           <Image
             className="w-12 h-12 rounded-full object-cover"
-            alt="Host profile"
+            alt={t("hostProfileAlt")}
             width={48}
             height={48}
             src="https://avatars.githubusercontent.com/u/93591100?v=4"
@@ -41,23 +44,23 @@ export default function RoomDetails() {
       <div className="space-y-5">
         <Feature
           Icon={Wifi}
-          title="Toàn bộ nhà"
-          description="Bạn sẽ có chung cư cao cấp cho riêng mình."
+          title={t("features.entirePlace.title")}
+          description={t("features.entirePlace.description")}
         />
         <Feature
           Icon={Tv}
-          title="Vệ sinh tăng cường"
-          description="Chủ nhà này đã cam kết thực hiện quy trình vệ sinh tăng cường 5 bước của Airbnb. Hiển thị thêm"
+          title={t("features.enhancedCleaning.title")}
+          description={t("features.enhancedCleaning.description")}
           hasMoreButton={true}
         />
         <Feature
           Icon={ParkingSquare}
-          title="Phong là Chủ nhà siêu cấp"
-          description="Chủ nhà siêu cấp là những chủ nhà có kinh nghiệm, được đánh giá cao và là những người cam kết mang lại quãng thời gian ở tuyệt vời cho khách."
+          title={t("features.superhost.title")}
+          description={t("features.superhost.description")}
         />
         <Feature
           Icon={MdIron}
-          title="Miễn phí hủy trong 48 giờ"
+          title={t("features.freeCancellation.title")}
         />
       </div>
 
@@ -66,16 +69,16 @@ export default function RoomDetails() {
       {/* Description */}
       <div className="w-full">
         <button className="w-full text-black bg-white border-2 border-black rounded-lg py-1 hover:bg-rose-100 hover:text-rose-600 duration-300 flex justify-between items-center px-6 cursor-pointer hover:border-transparent">
-          <span>Dịch sang tiếng Anh</span>
+          <span>{t("translateToEnglish")}</span>
           <FaLanguage className="!w-12 !h-12" />
         </button>
         <p className="text-justify py-3 text-md sm:text-base">
-          Tự nhận phòng<br />
-          Tự nhận phòng bằng khóa thông minh.<br />
-          Dinh Long là Chủ nhà siêu cấp<br />
-          Chủ nhà siêu cấp là những chủ nhà có kinh nghiệm, được đánh giá cao và là những người cam kết mang lại quãng thời gian ở tuyệt vời cho khách.
+          {t("selfCheckIn")}<br />
+          {t("selfCheckInDetails")}<br />
+          {t("superhostName", { name: "Dinh Long" })}<br />
+          {t("superhostDescription")}
         </p>
-        <span className="font-bold underline cursor-pointer">Hiển thị thêm</span>
+        <span className="font-bold underline cursor-pointer">{t("showMore")}</span>
       </div>
 
       <div className="mb-5 w-full h-px bg-gray-300"></div>
@@ -84,6 +87,8 @@ export default function RoomDetails() {
 }
 
 function Feature({ Icon, title, description, hasMoreButton = false }: FeatureProps) {
+  const t = useTranslations("RoomDetail");
+
   return (
     <div className="flex gap-5">
       <Icon className="w-6 h-6" />
@@ -93,7 +98,7 @@ function Feature({ Icon, title, description, hasMoreButton = false }: FeaturePro
           <p className="text-sm text-gray-600 text-justify dark:text-white">
             {description}
             {hasMoreButton && (
-              <span className="underline font-bold cursor-pointer"> Hiển thị thêm</span>
+              <span className="underline font-bold cursor-pointer"> {t("showMore")}</span>
             )}
           </p>
         )}

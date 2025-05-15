@@ -5,8 +5,10 @@ import { Navigation, Pagination } from 'swiper/modules';
 import { isValidUrl } from "@/lib/utils";
 import Image from 'next/image';
 import "@/lib/client/assests/swiper-custom.css"
+import { useTranslations } from 'next-intl';
 
 export default function RoomImage({ roomImage }: { roomImage: string }) {
+  const t = useTranslations("RoomDetail");
   return (
     <div className="w-full">
       <Swiper
@@ -21,10 +23,9 @@ export default function RoomImage({ roomImage }: { roomImage: string }) {
               src={isValidUrl(roomImage)
                 ? roomImage
                 : "/placeholder.svg"}
-              alt={`Room image ${index + 1}`}
+              alt={t("roomImageAlt", { index: index + 1 })}
               className="object-cover"
-              fill
-              priority
+              fill             
             />
           </SwiperSlide>
         ))}

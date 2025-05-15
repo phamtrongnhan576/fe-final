@@ -17,7 +17,7 @@ import { showErrorToast, showSuccessToast } from "@/lib/client/services/notifica
 import { useDispatch, useSelector } from "react-redux";
 import { setSearch } from "@/lib/client/store/slices/searchSlice";
 import { RootState } from "@/lib/client/store/store";
-
+import { useTranslations } from "next-intl";
 export default function SearchPanel() {
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [showGuestModal, setShowGuestModal] = useState<boolean>(false);
@@ -27,6 +27,7 @@ export default function SearchPanel() {
   const dispatch = useDispatch();
   const router = useRouter();
   const positions = useSelector((state: RootState) => state.position);
+  const t = useTranslations("Search");
 
   const form = useForm<z.infer<typeof searchSchema>>({
     resolver: zodResolver(searchSchema),
@@ -97,12 +98,12 @@ export default function SearchPanel() {
         >
           <div className="ml-2 flex w-full flex-col">
             <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              Địa điểm
+              {t("Location")}
             </span>
             <div className="flex items-center gap-2">
               <Search className="text-gray-500 dark:text-gray-400" />
               <span className="truncate text-sm text-gray-800 dark:text-gray-200">
-                {form.watch("location") || "Bạn muốn đi đâu?"}
+                {form.watch("location") || t("Where do you want to go?")}
               </span>
             </div>
           </div>
@@ -119,14 +120,14 @@ export default function SearchPanel() {
         >
           <div className="ml-2 flex w-full flex-col">
             <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              Nhận phòng
+              {t("Check in")}
             </span>
             <div className="flex items-center gap-2">
               <CalendarIcon className="text-gray-500 dark:text-gray-400" />
               <span className="text-sm text-gray-800 dark:text-gray-200">
                 {form.watch("checkIn")
                   ? formatDate(form.watch("checkIn"))
-                  : "Thêm ngày"}
+                  : t("Add date")}
               </span>
             </div>
           </div>
@@ -143,14 +144,14 @@ export default function SearchPanel() {
         >
           <div className="ml-2 flex w-full flex-col">
             <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              Trả phòng
+              {t("Check out")}
             </span>
             <div className="flex items-center gap-2">
               <CalendarIcon className="text-gray-500 dark:text-gray-400" />
               <span className="text-sm text-gray-800 dark:text-gray-200">
                 {form.watch("checkOut")
                   ? formatDate(form.watch("checkOut"))
-                  : "Thêm ngày"}
+                  : t("Add date")}
               </span>
             </div>
           </div>
@@ -167,14 +168,14 @@ export default function SearchPanel() {
         >
           <div className="ml-2 flex w-full flex-col">
             <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              Khách
+              {t("Guests")}
             </span>
             <div className="flex items-center gap-2">
               <User className="text-gray-500 dark:text-gray-400" />
               <span className="text-sm text-gray-800 dark:text-gray-200">
                 {form.watch("guests") > 0
-                  ? `${form.watch("guests")} khách`
-                  : "Thêm khách"}
+                  ? `${form.watch("guests")} ${t("Guests")}`
+                  : t("Add guests")}
               </span>
             </div>
           </div>
@@ -186,7 +187,7 @@ export default function SearchPanel() {
           className="flex cursor-pointer items-center gap-2 rounded-full bg-rose-600 py-6 text-white hover:bg-rose-700 hover:shadow-md dark:bg-rose-700 dark:hover:bg-rose-800"
         >
           <Search className="text-white" />
-          <span className="font-medium">Tìm kiếm</span>
+          <span className="font-medium">{t("Search")}</span>
         </Button>
 
         {/* Replace the Dialog components with the new components */}

@@ -5,9 +5,10 @@ import { Room, PositionWithSlug } from '@/lib/client/types/types';
 import { formatISOToDDMMYYYY } from '@/lib/utils';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/client/store/store';
-import EmptyState from '../common/EmptyState';
 import "@/lib/client/assests/swiper-custom.css"
 import RoomCard from './RoomCard';
+import { useTranslations } from 'next-intl';
+
 
 const DynamicMap = dynamic(() => import('./Map'), {
   ssr: false,
@@ -15,28 +16,18 @@ const DynamicMap = dynamic(() => import('./Map'), {
 
 export default function ListRoom({ rooms, position }: { rooms: Room[]; position: PositionWithSlug }) {
   const searchData = useSelector((state: RootState) => state.search);
-
-  if (rooms.length === 0) {
-    return (
-      <EmptyState
-        icon="home"
-        title="Không tìm thấy chỗ ở phù hợp"
-        description={`Chúng tôi không tìm thấy chỗ ở nào tại ${position.tinhThanh} trong khoảng thời gian bạn chọn.`}
-        actionText="Thử lại"
-      />
-    );
-  }
+  const t = useTranslations('ListRoom');
 
   return (
     <div className="max-w-md mx-auto sm:container mt-8 md:mt-0">
       <div className='grid grid-cols-1 lg:grid-cols-2 md:gap-3 relative'>
         <div className="md:py-12 space-y-3">
           <p>
-            Có {rooms.length} chỗ ở tại {position.tinhThanh} •{" "}
+            {t('found_accommodations', { count: rooms.length, location: position.tinhThanh })} •{" "}
             {formatISOToDDMMYYYY(searchData.checkIn)} –{" "}
             {formatISOToDDMMYYYY(searchData.checkOut)}
           </p>
-          <h1 className="font-bold text-xl md:text-3xl text-black dark:text-white ">Chỗ ở tại khu vực bản đồ đã chọn</h1>
+          <h1 className="font-bold text-xl md:text-3xl text-black dark:text-white ">{t('stays_in_selected_map_area')}</h1>
           <div className="space-y-6">
             {rooms.map((room, index) => (
               <RoomCard key={room.id} room={room} position={position} index={index} />

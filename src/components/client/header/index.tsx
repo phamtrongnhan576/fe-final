@@ -7,12 +7,22 @@ import Menu from "./MenuHeader";
 import MobileMenu from "./MobileMenu";
 import { useHeaderScroll } from "../hooks/useHeaderScroll";
 import { navItems } from "@/lib/client/types/dataTypes";
+import { useLocale, useTranslations } from "next-intl";
 
 const Header = () => {
+
   const { isScrolled, isMounted, pathname, visible, setVisible } =
     useHeaderScroll();
 
+  const t = useTranslations("Header");
+  const locale = useLocale();
+
   if (!isMounted) return null;
+
+  const translatedNavItems = navItems.map((item) => ({
+    ...item,
+    label: t(item.label),
+  }));
 
   return (
     <motion.nav
@@ -32,12 +42,12 @@ const Header = () => {
     >
       <div className="relative container mx-auto flex items-center justify-between p-6">
         <Link href="/" className="flex items-center gap-3">
-          <div className="w-7 h-7 md:w-9 md:h-9 relative">
+          <div className="relative w-7 h-7 md:w-8 md:h-8">
             <Image
               src="/airbnb-1.svg"
               alt="Logo"
               fill
-              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
               priority
             />
           </div>
@@ -48,15 +58,14 @@ const Header = () => {
 
         <div className="hidden md:flex">
           <ul className="flex space-x-6 font-semibold">
-            {navItems.map((item) => (
+            {translatedNavItems.map((item) => (
               <li key={item.key}>
                 <Link
-                  href={item.href}
-                  className={`transition-colors duration-200 ${
-                    pathname === item.href
-                      ? "text-custom-rose"
-                      : "dark:hover:text-custom-rose hover:text-custom-rose text-white"
-                  }`}
+                  href={`/${locale}${item.href}`}
+                  className={`transition-colors duration-200 ${pathname === `/${locale}${item.href}`
+                      ? "text-rose-600"
+                      : "dark:hover:text-rose-600 hover:text-rose-600 text-white"
+                    }`}
                 >
                   {item.label}
                 </Link>

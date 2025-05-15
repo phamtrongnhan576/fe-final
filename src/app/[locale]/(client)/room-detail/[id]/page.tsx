@@ -1,3 +1,5 @@
+"use client";
+
 import { getCommentsById, getRoomsById } from "@/lib/client/services/apiService";
 import { sortCommentsByIdDescending } from "@/lib/utils";
 import CommentsSection from "@/components/client/rooms/CommentsSection";
@@ -7,12 +9,29 @@ import BookingForm from "@/components/client/room-detail/BookingForm";
 import RoomAmenities from "@/components/client/room-detail/RoomAmenities";
 import CommentForm from "@/components/client/room-detail/CommentForm";
 import RoomImage from "@/components/client/room-detail/RoomImage";
+import useApi from "@/lib/client/services/useAPI";
+import Loading from "@/components/client/common/Loading";
+import Error from "@/components/client/common/Error";
+import { useParams } from "next/navigation";
 
-export default async function RoomDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function RoomDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
+
+  const {
+    data: room,
+    error: roomError,
+    isLoading: roomLoading,
+  } = useApi(`room/${id}`, () => getRoomsById(id));
   
-  const room = await getRoomsById(id);
-  const comments = await getCommentsById(id);
+  const {
+    data: comments,
+    error: commentsError,
+    isLoading: commentsLoading,
+  } = useApi(`comments/${id}`, () => getCommentsById(id));
+
+  if (roomLoading || commentsLoading) return <Loading />;
+  if (roomError || commentsError || !room || !comments) return <Error />;
 
   const sortedComments = sortCommentsByIdDescending(comments);
 

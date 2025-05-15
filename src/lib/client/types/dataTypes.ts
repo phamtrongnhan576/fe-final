@@ -33,16 +33,16 @@ export type AmenityItem = {
 };
 
 export const amenities: AmenityItem[] = [
-  { Icon: Wifi, label: "Wifi" },
-  { Icon: Tv, label: "Tivi" },
-  { Icon: ParkingSquare, label: "Bãi đỗ xe" },
-  { Icon: MdIron, label: "Bàn ủi" },
-  { Icon: FaSwimmingPool, label: "Hồ bơi" },
-  { Icon: FaHandsWash, label: "Máy giặt" },
+  { Icon: Wifi, label: "wifi" },
+  { Icon: Tv, label: "tv" },
+  { Icon: ParkingSquare, label: "parking" },
+  { Icon: MdIron, label: "ironingBoard" },
+  { Icon: FaSwimmingPool, label: "swimmingPool" },
+  { Icon: FaHandsWash, label: "washingMachine" },
 ];
 
 export const navItems: NavItem[] = [
-  { key: "home", label: "Home", href: "/" },
+  { key: "home", label: "Home", href: "" },
   { key: "about", label: "About", href: "/under-dev" },
   { key: "services", label: "Services", href: "/under-dev" },
   { key: "pricing", label: "Pricing", href: "/under-dev" },
@@ -51,35 +51,35 @@ export const navItems: NavItem[] = [
 
 export const listInforPositions: ListInforPositions[] = [
   {
-    duration: "15 phút lái xe",
+    duration: "15 minutes drive",
     image: "/position/1.webp"
   },
   {
-    duration: "3 giờ lái xe",
+    duration: "3 hours drive",
     image: "/position/2.webp"
   },
   {
-    duration: "6.5 giờ lái xe",
+    duration: "6 hours drive",
     image: "/position/3.webp"
   },
   {
-    duration: "15 phút lái xe",
+    duration: "10 minutes drive",
     image: "/position/4.jpg"
   },
   {
-    duration: "7.5 giờ lái xe",
+    duration: "7 hours drive",
     image: "/position/5.webp"
   },
   {
-    duration: "45 phút lái xe",
+    duration: "45 minutes drive",
     image: "/position/6.webp"
   },
   {
-    duration: "30 phút lái xe",
+    duration: "30 minutes drive",
     image: "/position/7.webp"
   },
   {
-    duration: "5 giờ lái xe",
+    duration: "5 hours drive",
     image: "/position/8.webp"
   }
 ]
@@ -87,22 +87,22 @@ export const listInforPositions: ListInforPositions[] = [
 export const listHomeRooms: ListHomeRooms[] = [
   {
     href: "/rooms/ho-chi-minh",
-    title: "Toàn bộ nhà",
+    title: "all",
     image: "/room/1.webp"
   },
   {
     href: "/rooms/nha-trang",
-    title: "Chỗ ở độc đáo",
+    title: "unique",
     image: "/room/2.webp"
   },
   {
     href: "/rooms/da-lat",
-    title: "Trang trại và thiên nhiên",
+    title: "farm",
     image: "/room/3.webp"
   },
   {
     href: "/rooms/da-nang",
-    title: "Cho phép mang theo thú cưng",
+    title: "pet",
     image: "/room/4.webp"
   }
 ]

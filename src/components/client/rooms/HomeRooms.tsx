@@ -4,16 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
 import { listHomeRooms } from '@/lib/client/types/dataTypes';
-
+import { useTranslations } from 'next-intl';
 export default function HomeRooms() {
+  const t = useTranslations('HomeRooms');
+  
+  const translateListHomeRooms = listHomeRooms.map((room) => ({
+    ...room,
+    title: t(room.title)
+  }));
+
   return (
     <div className="max-w-md md:container mx-auto space-y-6 pt-8 pb-20">
       <h1 className="font-bold text-3xl text-gray-800 dark:text-gray-100">
-        Ở bất cứ đâu
+        {t('title')}
       </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {listHomeRooms.map((room, index) => (
+        {translateListHomeRooms.map((room, index) => (
           <Link
             key={index}
             href={room.href}
@@ -23,13 +30,13 @@ export default function HomeRooms() {
             <Card className="w-full h-full overflow-hidden border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
               <CardHeader className="p-0 relative">
                 <div className="aspect-video overflow-hidden">
-                  <div className="w-full h-full transition-transform duration-500 group-hover:scale-105">
+                  <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
                     <Image
                       src={room.image}
                       alt={room.title}
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       fill
                       className="object-cover"
-                      priority
                     />
                   </div>
                 </div>
@@ -41,7 +48,7 @@ export default function HomeRooms() {
                   {room.title}
                 </CardTitle>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Khám phá ngay
+                  {t('discover')}
                 </p>
               </CardContent>
             </Card>

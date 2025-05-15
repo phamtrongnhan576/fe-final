@@ -11,7 +11,7 @@ import { RootState } from '@/lib/client/store/store';
 import { Comment, Room } from '@/lib/client/types/types';
 import { AxiosError } from 'axios';
 import { bookingSchema } from '@/lib/client/validator/validatior';
-import { formatDate } from '@/lib/utils';
+import { convertUSDToVND, formatDate } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, Minus, Plus, Star } from 'lucide-react';
 import Link from 'next/link';
@@ -19,6 +19,8 @@ import { useState } from 'react';
 import { useForm, useFormContext, UseFormReturn } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { z } from 'zod';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 type BookingFormProps = {
   room: Room;
@@ -36,6 +38,8 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
   const pricePerNight = room.giaTien;
   const cleaningFee = 8;
   const user = useSelector((state: RootState) => state.user);
+  const t = useTranslations("RoomDetail");
+  const locale = useLocale();
 
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
@@ -72,10 +76,10 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
   const onSubmit = async (data: z.infer<typeof bookingSchema>) => {
     try {
       if (!user.id) {
-        showErrorToast("Vui lòng đăng nhập để đặt phòng");
+        showErrorToast(t("loginRequired"));
         return;
       }
-      
+
       const bookingData = {
         ...data,
         ngayDen: data.ngayDen.toISOString(),
@@ -84,7 +88,7 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
       };
 
       await createBooking(bookingData);
-      showSuccessToast("Đặt phòng thành công");
+      showSuccessToast(t("bookingSuccess"));
     } catch (error) {
       console.log(error);
       handleApiError(error as AxiosError);
@@ -96,14 +100,14 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
       <div className="p-6 rounded-lg border-2 border-gray-300 space-y-6 shadow-xl dark:bg-gray-800 dark:border-gray-700 dark:border-1">
         <div className="flex flex-wrap justify-between items-center gap-3">
           <div>
-            <span className="font-bold">${pricePerNight}</span>/ night
+            <span className="font-bold">{locale !== "vi" && "$"}{convertUSDToVND(pricePerNight)}</span> {t("perNight")}
           </div>
           <div>
             <span className="space-x-2 flex items-center justify-center">
               <Star className="text-rose-600" />
               <span className="text-black font-bold dark:text-white">{calculateAverageRating()}</span>
               <span className="text-gray-600 hover:text-rose-600 duration-300 dark:text-white">
-                ({comments.length}) đánh giá
+                ({comments.length}) {t("reviews")}
               </span>
             </span>
           </div>
@@ -117,12 +121,12 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
               type="submit"
               className="bg-rose-600 w-full py-3 rounded-lg font-bold text-white hover:bg-rose-700 cursor-pointer"
             >
-              Kiểm tra tình trạng còn phòng
+              {t("checkAvailability")}
             </Button>
           </form>
         </Form>
 
-        <p className="text-center text-gray-400 dark:text-white">Bạn vẫn chưa bị trừ tiền</p>
+        <p className="text-center text-gray-400 dark:text-white">{t("notChargedYet")}</p>
         <PriceSummary
           price={pricePerNight}
           nights={nights}
@@ -142,7 +146,7 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
           <path d="m7.5011 1c.5272 0 .9591.40794.99725.92537l.00275.07463v1h5.5c.31265 0 .5435.281645.4935.581075l-.01275.056285-.96125 3.36264.96125 3.36265c.08055.2818-.0967.5625-.36775.62465l-.0554.00945-.0576.00325h-5.5c-.5272 0-.9591-.40795-.99725-.92535l-.00275-.07465v-1h-5v6h-1v-14zm1 3h-1v4h1z" />
         </svg>
         <Link href="/under-dev" className="underline hover:text-rose-600 dark:text-white">
-          Báo cáo nhà/phòng cho thuê này
+          {t("reportListing")}
         </Link>
       </div>
     </div>
@@ -153,11 +157,12 @@ function DatePicker() {
   const form = useFormContext<z.infer<typeof bookingSchema>>();
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
+  const t = useTranslations("RoomDetail");
 
   return (
     <div className="grid grid-cols-2 gap-2 border-b pb-4 dark:border-gray-500">
       <div>
-        <label className="text-sm font-medium">Nhận phòng</label>
+        <label className="text-sm font-medium">{t("checkIn")}</label>
         <FormField
           control={form.control}
           name="ngayDen"
@@ -172,7 +177,7 @@ function DatePicker() {
                     >
                       <CalendarIcon className="mr-3 h-5 w-5 text-gray-500 dark:text-white" />
                       <span className="text-gray-700 dark:text-white">
-                        {field.value ? formatDate(field.value) : 'Chọn ngày nhận phòng'}
+                        {field.value ? formatDate(field.value) : t("selectCheckInDate")}
                       </span>
                     </Button>
                   </PopoverTrigger>
@@ -217,7 +222,7 @@ function DatePicker() {
         />
       </div>
       <div>
-        <label className="text-sm font-medium">Trả phòng</label>
+        <label className="text-sm font-medium">{t("checkOut")}</label>
         <FormField
           control={form.control}
           name="ngayDi"
@@ -232,7 +237,7 @@ function DatePicker() {
                     >
                       <CalendarIcon className="mr-3 h-5 w-5 text-gray-500 dark:text-white" />
                       <span className="text-gray-700 dark:text-white">
-                        {field.value ? formatDate(field.value) : 'Chọn ngày trả phòng'}
+                        {field.value ? formatDate(field.value) : t("selectCheckOutDate")}
                       </span>
                     </Button>
                   </PopoverTrigger>
@@ -284,9 +289,11 @@ function DatePicker() {
 
 function GuestCounter({ form }: { form: UseFormReturn<z.infer<typeof bookingSchema>> }) {
   const maxGuests = 10;
+  const t = useTranslations("RoomDetail");
+
   return (
     <div className="p-3 border-2 border-gray-600 rounded-lg">
-      <div className="mb-3 font-bold">Khách</div>
+      <div className="mb-3 font-bold">{t("guests")}</div>
       <FormField
         control={form.control}
         name="soLuongKhach"
@@ -301,7 +308,7 @@ function GuestCounter({ form }: { form: UseFormReturn<z.infer<typeof bookingSche
                 >
                   <Minus />
                 </Button>
-                <span>{field.value} khách</span>
+                <span>{field.value} {t("guestCount")}</span>
                 <Button
                   type="button"
                   className="w-9 h-9 bg-rose-600 hover:bg-rose-700 rounded-full dark:text-white cursor-pointer"
@@ -320,20 +327,23 @@ function GuestCounter({ form }: { form: UseFormReturn<z.infer<typeof bookingSche
 }
 
 function PriceSummary({ price, nights, cleaningFee, total }: PriceSummaryProps) {
+  const t = useTranslations("RoomDetail");
+  const locale = useLocale();
+
   return (
     <>
       <div className="flex justify-between items-center">
-        <p className="text-base">${price} X {nights} nights</p>
-        <p className="font-mono text-lg font-bold">${price * nights}</p>
+        <p className="text-base">{locale !== "vi" && "$"}{convertUSDToVND(price)} X {nights} {t("nights")}</p>
+        <p className="font-mono text-lg font-bold">{locale !== "vi" && "$"}{convertUSDToVND(price * nights)}</p>
       </div>
       <div className="flex justify-between items-center">
-        <p className="text-base">Cleaning fee</p>
-        <p className="font-mono text-lg font-bold">${cleaningFee}</p>
+        <p className="text-base">{t("cleaningFee")}</p>
+        <p className="font-mono text-lg font-bold">{locale !== "vi" && "$"}{convertUSDToVND(cleaningFee)}</p>
       </div>
       <div className="mb-5 w-full h-px bg-gray-300 dark:bg-gray-500"></div>
       <div className="flex justify-between items-center">
-        <p className="font-bold text-lg">Total before taxes</p>
-        <p className="font-mono text-lg font-bold">${total}</p>
+        <p className="font-bold text-lg">{t("totalBeforeTaxes")}</p>
+        <p className="font-mono text-lg font-bold">{locale !== "vi" && "$"}{convertUSDToVND(total)}</p>
       </div>
     </>
   );

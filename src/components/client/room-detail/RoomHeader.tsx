@@ -4,15 +4,18 @@ import { Room } from '@/lib/client/types/types';
 import { Star } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/client/store/store';
+import { useTranslations } from 'next-intl';
 
 export default function RoomHeader({ room }: { room: Room }) {
   const positions = useSelector((state: RootState) => state.position);
   const positionDetail = positions.find((position) => position.id === room.id);
+  const t  = useTranslations("RoomDetail");
+  
   return (
     <>
       {/* Room title */}
       <h2 className="font-bold text-xl sm:text-3xl pt-4 ">
-        {room.tenPhong || "NewApt D1 - Cozy studio - NU apt - 500m Bui Vien!"}
+        {room.tenPhong}
       </h2>
 
       {/* Basic information */}
@@ -22,7 +25,7 @@ export default function RoomHeader({ room }: { room: Room }) {
             <div className="flex gap-x-6">
               <span className="flex items-center space-x-2">
                 <Star className="w-4 h-4 text-[#FF5A5F]" />
-                <span className="text-gray-600 dark:text-white">Chủ nhà siêu cấp</span>
+                <span className="text-gray-600 dark:text-white">{t("superhost")}</span>
               </span>
             </div>
             <span
