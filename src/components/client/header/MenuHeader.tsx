@@ -170,6 +170,17 @@ const MenuHeader = ({ visible, setVisible }: MenuHeaderProps) => {
                     >
                       {t("Profile")}
                     </Link>
+
+
+                    {userParsed?.role === "ADMIN" && (
+        <Link
+          href="/admin"
+          className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
+        >
+          {t("Admin Page")}
+        </Link>
+      )}
+                 
                     <Link
                       href="/under-dev"
                       className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
