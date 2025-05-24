@@ -1,3 +1,6 @@
+import { AxiosError } from "axios";
+import { SWRConfiguration } from "swr";
+
 export interface Position {
   id: number;
   tenViTri: string;
@@ -77,12 +80,12 @@ export interface SignIn {
 }
 
 export interface SignUp {
-  name: string;
+  name?: string;
   email: string;
   password: string;
   phone?: string;
   birthday?: string;
-  gender: boolean;
+  gender?: boolean;
 }
 
 export interface User {
@@ -109,4 +112,44 @@ export interface Booking {
 export interface Coordinates {
   latitude: number;
   longitude: number;
+  messageKey?: string;
 }
+
+export interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}
+
+export type ApiError = AxiosError | Error;
+
+export interface UseApiOptions<T, E extends ApiError> extends SWRConfiguration<T, E> {
+  translate?: (key: string) => string;
+}
+
+export type SearchType = {
+  location: string;
+  checkIn: Date;
+  checkOut: Date;
+  guests: number;
+} 
+
+export interface BookingType {
+  id: number;
+  maPhong: number;
+  ngayDen: Date;
+  ngayDi: Date;
+  soLuongKhach: number;
+  maNguoiDung: number;
+}
+
+export interface CommentType {
+  maPhong: number;
+  maNguoiBinhLuan: number;
+  ngayBinhLuan: Date;
+  noiDung: string;
+  saoBinhLuan: number;
+}
+
+

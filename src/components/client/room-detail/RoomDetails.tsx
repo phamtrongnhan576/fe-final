@@ -1,16 +1,16 @@
-import { Star, Wifi, Tv, ParkingSquare } from 'lucide-react';
-import { MdIron } from 'react-icons/md';
-import { FaLanguage } from 'react-icons/fa';
-import Image from 'next/image';
-import { IconComponent } from '@/lib/client/types/dataTypes';
-import { useTranslations } from 'next-intl';
+import { Star, Wifi, Tv, ParkingSquare } from "lucide-react";
+import { MdIron } from "react-icons/md";
+import { FaLanguage } from "react-icons/fa";
+import Image from "next/image";
+import { IconComponent } from "@/lib/client/types/dataTypes";
+import { useTranslations } from "next-intl";
 
 type FeatureProps = {
   Icon: IconComponent;
   title: string;
   description?: string;
   hasMoreButton?: boolean;
-}
+};
 
 export default function RoomDetails() {
   const t = useTranslations("RoomDetail");
@@ -20,9 +20,12 @@ export default function RoomDetails() {
       <div className="flex justify-between items-center">
         <div className="space-y-3">
           <h3 className="text-lg sm:text-xl font-bold">
-            {t("entireApartment")} <span className="underline uppercase">nnhatsang</span>
+            {t("entireApartment")}{" "}
+            <span className="underline uppercase">nnhatsang</span>
           </h3>
-          <p className='text-md sm:text-base'>{t("roomSummary", { guests: 3 })}</p>
+          <p className="text-md sm:text-base">
+            {t("roomSummary", { guests: 3 })}
+          </p>
         </div>
         <div className="relative">
           <Image
@@ -40,7 +43,6 @@ export default function RoomDetails() {
 
       <div className="mb-5 w-full h-px bg-gray-300"></div>
 
-      {/* Key features */}
       <div className="space-y-5">
         <Feature
           Icon={Wifi}
@@ -58,27 +60,28 @@ export default function RoomDetails() {
           title={t("features.superhost.title")}
           description={t("features.superhost.description")}
         />
-        <Feature
-          Icon={MdIron}
-          title={t("features.freeCancellation.title")}
-        />
+        <Feature Icon={MdIron} title={t("features.freeCancellation.title")} />
       </div>
 
       <div className="mb-5 w-full h-px bg-gray-300"></div>
 
-      {/* Description */}
       <div className="w-full">
-        <button className="w-full text-black bg-white border-2 border-black rounded-lg py-1 hover:bg-rose-100 hover:text-rose-600 duration-300 flex justify-between items-center px-6 cursor-pointer hover:border-transparent">
+        <button className="w-full text-black bg-white border-2 border-black rounded-lg py-1 hover:bg-rose-100 hover:text-rose-600 duration-300 flex justify-between items-center px-6 cursor-pointer hover:border-transparent dark:bg-rose-600  dark:hover:bg-rose-700 dark:text-white dark:border-none">
           <span>{t("translateToEnglish")}</span>
           <FaLanguage className="!w-12 !h-12" />
         </button>
         <p className="text-justify py-3 text-md sm:text-base">
-          {t("selfCheckIn")}<br />
-          {t("selfCheckInDetails")}<br />
-          {t("superhostName", { name: "Dinh Long" })}<br />
+          {t("selfCheckIn")}
+          <br />
+          {t("selfCheckInDetails")}
+          <br />
+          {t("superhostName", { name: "Dinh Long" })}
+          <br />
           {t("superhostDescription")}
         </p>
-        <span className="font-bold underline cursor-pointer">{t("showMore")}</span>
+        <span className="font-bold underline cursor-pointer">
+          {t("showMore")}
+        </span>
       </div>
 
       <div className="mb-5 w-full h-px bg-gray-300"></div>
@@ -86,7 +89,12 @@ export default function RoomDetails() {
   );
 }
 
-function Feature({ Icon, title, description, hasMoreButton = false }: FeatureProps) {
+function Feature({
+  Icon,
+  title,
+  description,
+  hasMoreButton = false,
+}: FeatureProps) {
   const t = useTranslations("RoomDetail");
 
   return (
@@ -98,7 +106,10 @@ function Feature({ Icon, title, description, hasMoreButton = false }: FeaturePro
           <p className="text-sm text-gray-600 text-justify dark:text-white">
             {description}
             {hasMoreButton && (
-              <span className="underline font-bold cursor-pointer"> {t("showMore")}</span>
+              <span className="underline font-bold cursor-pointer">
+                {" "}
+                {t("showMore")}
+              </span>
             )}
           </p>
         )}

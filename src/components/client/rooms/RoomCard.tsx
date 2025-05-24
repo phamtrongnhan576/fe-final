@@ -9,7 +9,7 @@ import { Room, Position } from '@/lib/client/types/types';
 import { convertUSDToVND, isValidUrl } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
 
-export default function RoomCard({ room, position, index }: { room: Room; position: Position; index: number }) {
+export default function RoomCard({ room, position, index }: { room: Room; position?: Position; index: number }) {
   const t = useTranslations('RoomCard');
   const locale = useLocale();
 
@@ -62,7 +62,7 @@ export default function RoomCard({ room, position, index }: { room: Room; positi
               </Button>
             </div>
             <div>
-              <p className="text-gray-500 text-sm truncate dark:text-white">{t('entire_apartment', { location: position.tinhThanh })}</p>
+              <p className="text-gray-500 text-sm truncate dark:text-white">{t('entire_apartment', { location: position?.tinhThanh ?? "Không có tỉnh thành" })}</p>
               <p className="truncate md:text-xl dark:text-white text-lg">{room.tenPhong}</p>
               <div className="w-[15%] bg-gray-300 h-[3px] rounded-lg md:my-2 my-4" />
               <p className="text-gray-500 text-sm truncate dark:text-white">

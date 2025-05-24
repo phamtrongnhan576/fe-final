@@ -1,27 +1,36 @@
-import Banner from "@/components/client/banner";
+"use client";
+
 import Footer from "@/components/client/footer";
 import Header from "@/components/client/header";
 import FilterRoom from "@/components/client/rooms/FilterRoom";
 import Search from "@/components/client/search";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 import AOSInitializer from "@/lib/client/providers/AOSInitializer";
-import { type ReactNode } from "react";
+import { ReactNode } from "react";
+import Banner from "@/components/client/banner";
+import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
+import SubBanner from "@/components/client/banner/SubBanner";
 
-interface HomeLayoutProps {
-  children: ReactNode;
-}
+export default function HomeLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const locale = useLocale();
 
-export default async function HomeLayout({ children }: HomeLayoutProps) {
+  const isHomePage = pathname === `/${locale}`;
   return (
     <>
       <AOSInitializer />
       <Header />
-      <Banner />
+      {isHomePage ? (
+        <>
+          <Banner />
+        </>
+      ) : (
+        <SubBanner />
+      )}
       <Search />
       <FilterRoom />
-      <main
-        className="flex-1"
-      >
+      <main>
         {children}
         <ToastContainer />
       </main>

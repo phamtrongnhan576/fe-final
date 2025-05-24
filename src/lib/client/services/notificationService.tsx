@@ -4,38 +4,36 @@ import { toast } from 'react-toastify';
 
 export const showSuccessToast = (message: string) => {
   toast.success(message, {
-    position: 'top-right', 
-    autoClose: 3000, 
-    hideProgressBar: false, 
-    closeOnClick: true, 
-    pauseOnHover: true, 
-    draggable: true, 
-    theme: 'colored', 
+    position: 'top-right',
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: 'colored',
   });
 };
 
 export const showErrorToast = (message: string) => {
   toast.error(message, {
-    position: 'top-right',  
-    autoClose: 3000, 
-    hideProgressBar: false, 
-    closeOnClick: true, 
-    pauseOnHover: true, 
-    draggable: true, 
-    theme: 'colored', 
+    position: 'top-right',
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: 'colored',
   });
 };
 
-export const handleApiError = (error: unknown) => {
+export const handleApiError = (error: Error | AxiosError) => {
   if (error instanceof AxiosError) {
     const response = error.response;
+    const status = response?.status;
 
-    const errorMessage =
-      response?.data && typeof response.data === "object" && "content" in response.data
-        ? response.data.content
-        : "Lỗi không xác định";
+    const errorMessage = response && typeof response.data === "object" && "content" in response.data && typeof response.data.content === "string" ? response.data.content : "Lỗi không xác định";
 
-    switch (response?.status) {
+    switch (status) {
       case 400:
         showErrorToast(`Yêu cầu không hợp lệ: ${errorMessage}`);
         break;
@@ -52,10 +50,11 @@ export const handleApiError = (error: unknown) => {
         showErrorToast("Lỗi server, vui lòng thử lại sau");
         break;
       default:
-        showErrorToast(`Lỗi không xác định: ${errorMessage}`);
+        showErrorToast(errorMessage);
         break;
     }
+
   } else {
-    showErrorToast("Lỗi không xác định, vui lòng thử lại");
+    showErrorToast(error.message);
   }
 };

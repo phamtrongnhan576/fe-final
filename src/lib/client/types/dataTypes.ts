@@ -4,8 +4,9 @@ import { LucideProps } from 'lucide-react';
 import { Wifi, Tv, ParkingSquare } from 'lucide-react';
 import { MdIron } from 'react-icons/md';
 import { FaHandsWash, FaSwimmingPool } from 'react-icons/fa';
+import { Coordinates } from './types';
 
-type NavItem = {
+export type NavItem = {
   key: string;
   label: string;
   href: string;
@@ -106,3 +107,21 @@ export const listHomeRooms: ListHomeRooms[] = [
     image: "/room/4.webp"
   }
 ]
+
+export const botResponses = [
+  "Xin chào! Tôi có thể giúp gì cho bạn?",
+  "Cảm ơn bạn đã liên hệ. Tôi sẽ hỗ trợ bạn ngay.",
+  "Đây là một câu hỏi hay! Để tôi giải thích...",
+  "Tôi rất tiếc, tôi không hiểu câu hỏi của bạn. Bạn có thể hỏi lại được không?",
+  "Vui lòng cho tôi biết thêm chi tiết về vấn đề của bạn.",
+  "Tôi đang tìm kiếm thông tin cho bạn...",
+  "Đúng vậy, tôi có thể giúp bạn với vấn đề này!",
+  "Đây là một demo chatbot. Trong ứng dụng thực tế, chúng tôi sẽ kết nối với API để trả lời chính xác hơn.",
+  "Bạn có cần thêm thông tin gì không?",
+  "Tôi hy vọng thông tin này hữu ích cho bạn!"
+];
+
+export const DEFAULT_COORDINATES: Coordinates = {
+  latitude: 10.7769,
+  longitude: 106.7009,
+};

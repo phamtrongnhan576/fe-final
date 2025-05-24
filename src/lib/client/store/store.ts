@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import searchSlice from "./slices/searchSlice"
 import positionSlice from './slices/positionSlice'
 import userSlice from './slices/userSlice'
+import roomSlice from './slices/roomSlice'
 
 export const makeStore = () => {
   return configureStore({
@@ -9,6 +10,7 @@ export const makeStore = () => {
       search: searchSlice,
       position: positionSlice,
       user: userSlice,
+      room: roomSlice,
     },
   })
 }

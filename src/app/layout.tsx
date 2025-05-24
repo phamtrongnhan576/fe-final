@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import "@/app/globals.css";
 import ProviderRedux from "@/lib/client/store/StoreProvider"
 const roboto = Roboto({ subsets: ["latin"], weight: ["300", "400", "700"] });
 import { getLocale } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
+import { ThemeProviderWrapper } from "@/lib/client/providers/ThemeProviderWrapper";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,17 +21,12 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${roboto.className}`} suppressHydrationWarning>
+      <body className={roboto.className} >
         <ProviderRedux>
           <NextIntlClientProvider locale={locale}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              enableSystem
-              disableTransitionOnChange
-            >
+            <ThemeProviderWrapper>
               {children}
-            </ThemeProvider>
+            </ThemeProviderWrapper>
           </NextIntlClientProvider>
         </ProviderRedux>
       </body>

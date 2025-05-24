@@ -1,9 +1,11 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { Comment } from "./client/types/types";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { Comment, Position, PositionWithSlug } from "./client/types/types";
+import { slugify } from "transliteration";
+import { transliterate } from "transliteration";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 export const isValidUrl = (url: string) => {
   try {
@@ -37,25 +39,16 @@ export const formatISOToDDMMYYYY = (isoString: string): string => {
   return formatDateToDDMMYYYY(date);
 };
 
-export const convertToISODate = (dateString: string, hour: string = "17:00:00.000Z"): string | undefined => {
-  if (!dateString) return undefined;
+export const convertToISODate = (
+  dateString: string,
+  hour: string = "17:00:00.000Z"
+): string => {
   const [day, month, year] = dateString.split("/").map(Number);
-  if (!day || !month || !year) return undefined;
-  const date = new Date(year, month - 1, day);
-  if (isNaN(date.getTime())) return undefined;
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${hour}`;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(
+    2,
+    "0"
+  )}T${hour}`;
 };
-
-export const slugify = (str: string): string => {
-  return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-+/g, "-");
-}
 
 export const formatDateTime = (dateInput: Date) => {
   const date = new Date(dateInput);
@@ -69,7 +62,6 @@ export const formatDateTime = (dateInput: Date) => {
   const diffInDays = Math.floor(diffInHours / 24);
   const diffInMonths = Math.floor(diffInDays / 30);
   const diffInYears = Math.floor(diffInDays / 365);
-
 
   if (diffInYears >= 2) {
     return `${diffInYears} năm trước`;
@@ -94,7 +86,7 @@ export const formatDateTime = (dateInput: Date) => {
   } else {
     return `vừa xong`;
   }
-}
+};
 
 export const sortCommentsByIdDescending = (comments: Comment[]): Comment[] => {
   return [...comments].sort((a, b) => b.id - a.id);
@@ -103,8 +95,37 @@ export const sortCommentsByIdDescending = (comments: Comment[]): Comment[] => {
 export const convertUSDToVND = (amountInUSD: number, exchangeRate = 25000) => {
   const amountInVND = amountInUSD * exchangeRate;
 
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
   }).format(amountInVND);
-}
+};
+
+export const generateId = () => crypto.randomUUID();
+
+export const getTranslatedItems = <T>(
+  items: T[],
+  t: (key: string) => string,
+  key: keyof T
+): T[] => {
+  return items.map((item) => ({
+    ...item,
+    [key]: t(String(item[key])),
+  }));
+};
+
+export const mapPositionWithSlug = (data: Position[]): PositionWithSlug[] => {
+  return data.map((position) => ({
+    ...position,
+    slug: slugify(position.tinhThanh),
+  }));
+};
+
+export const getLanguages = () => [
+  { name: "English", locale: "en" },
+  { name: "Việt Nam", locale: "vi" },
+];
+
+export const normalizeText = (text: string): string => {
+  return transliterate(text).toLowerCase();
+};

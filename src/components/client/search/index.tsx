@@ -1,55 +1,44 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { fetchPosition } from "@/lib/client/services/apiService";
-import SearchPanelMobile from "./SearchPanelMobile";
-import SearchPanel from "./searchPanel";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Position, PositionWithSlug } from "@/lib/client/types/types";
-import { slugify } from "transliteration";
-import { setPositions } from "@/lib/client/store/slices/positionSlice";
+import { useWindowSize, useDebounce } from "react-use";
 import useApi from "@/lib/client/services/useAPI";
-import Loading from "../common/Loading";
-import Error from "../common/Error";
+import { fetchPosition } from "@/lib/client/services/apiService";
+import { setPositions } from "@/lib/client/store/slices/positionSlice";
+import SearchPanelMobile from "./SearchPanelMobile";
+import SearchPanel from "./SearchPanel";
+import { mapPositionWithSlug } from "@/lib/utils";
+import EmptyState from "../common/EmptyState";
+import { useTranslations } from "next-intl";
+
 const Search = () => {
   const [isMobile, setIsMobile] = useState(false);
   const dispatch = useDispatch();
+  const { width } = useWindowSize();
+  const tInfo = useTranslations("Info");
+  useDebounce(() => setIsMobile(width <= 768), 100, [Math.floor(width / 10)]);
 
-  const { data, error, isLoading } = useApi("/api/vi-tri", () => fetchPosition());
-  
+  const { data, error, isLoading } = useApi("/api/vi-tri", () =>
+    fetchPosition()
+  );
+
+  const positions = useMemo(() => {
+    return data ? mapPositionWithSlug(data) : [];
+  }, [data]);
+
   useEffect(() => {
-    if (data) {
-      const positions: PositionWithSlug[] = data.map((position: Position) => ({
-        id: position.id,
-        tenViTri: position.tenViTri,
-        tinhThanh: position.tinhThanh,
-        quocGia: position.quocGia,
-        hinhAnh: position.hinhAnh,
-        slug: slugify(position.tinhThanh),
-      }));
+    if (positions.length > 0) {
       dispatch(setPositions(positions));
     }
-  }, [data, dispatch]);
+  }, [positions, dispatch]);
 
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-
-    return () => window.removeEventListener("resize", checkIsMobile);
-  }, []);
-
-
-  if (error) return <Error />;
-  if (isLoading) return <Loading />;
+  if (error) {
+    return <EmptyState title={tInfo("no_position")} />;
+  }
 
   return isMobile ? (
-    <SearchPanelMobile />
+    <SearchPanelMobile isLoading={isLoading} />
   ) : (
-    <SearchPanel />
+    <SearchPanel isLoading={isLoading} />
   );
 };
 

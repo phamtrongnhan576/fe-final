@@ -1,31 +1,37 @@
-"use client"
-
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
-import { commentSchema } from '@/lib/client/validator/validatior';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Star, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from 'react';
-import { createComment } from '@/lib/client/services/apiService';
-import { handleApiError } from '@/lib/client/services/notificationService';
-import { AxiosError } from 'axios';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/lib/client/store/store';
-import { useTranslations } from 'next-intl';
+import { useState } from "react";
+import { createComment } from "@/lib/client/services/apiService";
+import { handleApiError } from "@/lib/client/services/notificationService";
+import { AxiosError } from "axios";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/client/store/store";
+import { useTranslations } from "next-intl";
+import { CommentType } from "@/lib/client/types/types";
+import { createSchemas } from "@/lib/client/validator/validatior";
 
 export default function CommentForm({ id }: { id: number }) {
   const user = useSelector((state: RootState) => state.user);
   const userAvatar = user.avatar;
   const userName = user.name;
   const t = useTranslations("RoomDetail");
+  const tValidation = useTranslations("ValidationErrors");
+  const commentSchema = createSchemas(tValidation);
 
-  const form = useForm<z.infer<typeof commentSchema>>({
-    resolver: zodResolver(commentSchema),
+  const form = useForm<CommentType>({
+    resolver: zodResolver(commentSchema.commentSchema),
     defaultValues: {
       maPhong: id,
       maNguoiBinhLuan: 47042,
@@ -35,9 +41,9 @@ export default function CommentForm({ id }: { id: number }) {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof commentSchema>) => {
+  const onSubmit = async (data: CommentType) => {
     try {
-      await createComment(data)
+      await createComment(data);
     } catch (error) {
       handleApiError(error as AxiosError);
     }
@@ -50,9 +56,9 @@ export default function CommentForm({ id }: { id: number }) {
           {userAvatar ? (
             <AvatarImage src={userAvatar} />
           ) : (
-            <AvatarFallback className="bg-gradient-to-br from-rose-300 to-rose-500">
-              <User className="text-white h-4 w-4" />
-            </AvatarFallback>
+            <div className="relative bg-gray-300 rounded-full bg-gradient-to-br from-rose-300 to-rose-500 p-4">
+              <User className="text-white h-4 w-4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            </div>
           )}
         </Avatar>
         <span className="font-semibold text-sm text-gray-600 dark:text-white">
@@ -114,10 +120,7 @@ interface RatingStarsProps {
   onChange: (value: number) => void;
 }
 
-const RatingStars = ({
-  value,
-  onChange
-}: RatingStarsProps) => {
+const RatingStars = ({ value, onChange }: RatingStarsProps) => {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
 
   return (
@@ -129,7 +132,9 @@ const RatingStars = ({
             key={index}
             className={cn(
               "h-6 w-6 cursor-pointer",
-              starValue <= (hoverValue || value) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+              starValue <= (hoverValue || value)
+                ? "fill-yellow-400 text-yellow-400"
+                : "text-gray-300"
             )}
             onClick={() => onChange(starValue)}
             onMouseEnter={() => setHoverValue(starValue)}

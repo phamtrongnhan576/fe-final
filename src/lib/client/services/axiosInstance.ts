@@ -4,6 +4,7 @@ const isClient = typeof window !== "undefined";
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  timeout: 5000,
   headers: {
     "Content-Type": "application/json",
     TokenCybersoft: process.env.NEXT_PUBLIC_TOKEN_CYBERSOFT,

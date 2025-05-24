@@ -1,10 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import 'aos/dist/aos.css';
-@import 'swiper/css';
-@import 'swiper/css/navigation';
-@import 'leaflet/dist/leaflet.css';
-@import 'react-toastify/dist/ReactToastify.css';
+@import "aos/dist/aos.css";
+@import "swiper/css";
+@import "swiper/css/navigation";
+@import "leaflet/dist/leaflet.css";
+@import "react-toastify/dist/ReactToastify.css";
+@import "react-datepicker/dist/react-datepicker.css";
 
 @custom-variant dark (&:is(.dark *));
 

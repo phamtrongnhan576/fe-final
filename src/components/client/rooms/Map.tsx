@@ -1,42 +1,73 @@
-'use client'
+'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L, { } from 'leaflet';
+import L from 'leaflet';
 import { PositionWithSlug } from '@/lib/client/types/types';
 import { getCoordinatesByCity } from '@/lib/client/services/apiService';
 import useApi from '@/lib/client/services/useAPI';
-import Loading from '../common/Loading';
-import Error from '../common/Error';
+import { useRef, useEffect } from 'react';
+import { SkeletonCard } from '../common/SkeletonCard';
 import EmptyState from '../common/EmptyState';
-
-
+import { useTranslations } from 'next-intl';
 
 const customIcon = new L.Icon({
   iconUrl: '/marker-icon.png',
   shadowUrl: '/marker-shadow.png',
 });
 
-export default function Map({ position }: { position: PositionWithSlug }) {
-  const { data, error, isLoading } = useApi("/api/map ", () => getCoordinatesByCity(position.tinhThanh));
+export default function Map({ position }: { position?: PositionWithSlug }) {
+  const key = position?.id ? `/map/${position.id}` : "";
+  const tInfo = useTranslations('Info');
 
-  if (error) return <Error />;
-  if (isLoading) return <Loading />;
+  const { data, isLoading, error } = useApi(key, () => getCoordinatesByCity(position?.tinhThanh ?? ""), {
+    translate: tInfo,
+  });
 
-  if (!data) return <EmptyState title="Không tìm thấy tọa độ" description="Vui lòng thử lại" />;
+  const mapRef = useRef<L.Map | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const { latitude, longitude } = data;
+  useEffect(() => {
+    if (!mapRef.current && containerRef.current && data) {
+      mapRef.current = L.map(containerRef.current, {
+        center: [data.latitude, data.longitude],
+        zoom: 13,
+        scrollWheelZoom: false,
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(mapRef.current);
+
+      L.marker([data.latitude, data.longitude], { icon: customIcon })
+        .addTo(mapRef.current)
+        .bindPopup(`${position?.tinhThanh ?? "Không có tỉnh thành"}, ${position?.quocGia ?? "Không có quốc gia"}`);
+    }
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [data, position]);
+
+  if (isLoading) {
+    return (
+      <SkeletonCard
+        height="h-[80vh]"
+      />
+    );
+  }
+
+  if (error) {
+    return <EmptyState title={tInfo('no_map')} />
+  }
 
   return (
-    <MapContainer center={[latitude, longitude]} zoom={13} scrollWheelZoom={false} className='h-[80vh] rounded-2xl'>
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <Marker position={[latitude, longitude]} icon={customIcon}>
-        <Popup>
-          {position.tinhThanh}, {position.quocGia}
-        </Popup>
-      </Marker>
-    </MapContainer>
+    <div
+      ref={containerRef}
+      className="h-[80vh] rounded-2xl z-10"
+      data-aos="flip-up"
+      data-aos-duration="500"
+    />
   );
 }

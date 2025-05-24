@@ -1,16 +1,17 @@
-"use client";
+'use client';
 
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function Loading() {
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-transparent">
+    <div className="bg-transparent flex flex-col items-center justify-center w-full h-full">
       <DotLottieReact
         src="/lottie/loading.lottie"
         loop
         autoplay
-        style={{ height: 400, width: 400 }}
+        style={{ height: 200 }}
       />
     </div>
   );
 }
+  

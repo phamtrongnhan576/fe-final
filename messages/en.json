@@ -28,7 +28,9 @@
     "Male": "Male",
     "Female": "Female",
     "Have account": "Already have an account?",
-    "Login now": "Login now"
+    "Login now": "Login now",
+    "Airbnb Home": "Airbnb Home",
+    "Select gender": "Select gender"
   },
   "Banner": {
     "Belong anywhere": "Belong anywhere"
@@ -40,7 +42,7 @@
   },
   "Search": {
     "Location": "Location",
-    "Where do you want to go?": "Where do you want to go?",
+    "Where are you going?": "Where are you going?",
     "Check in": "Check in",
     "Add date": "Add date",
     "Check out": "Check out",
@@ -66,7 +68,8 @@
     "Search accommodation": "Search accommodation",
     "Check-in date": "Check-in date",
     "Check-out date": "Check-out date",
-    "Number of guests": "Number of guests"
+    "Number of guests": "Number of guests",
+    "No results": "No results"
   },
   "FilterRoom": {
     "Accommodation type": "Accommodation type",
@@ -83,7 +86,8 @@
     "7 hours drive": "7 hours drive",
     "45 minutes drive": "45 minutes drive",
     "30 minutes drive": "30 minutes drive",
-    "5 hours drive": "5 hours drive"
+    "5 hours drive": "5 hours drive",
+    "availablePositions": "Available positions"
   },
   "HomeRooms": {
     "title": "Stay anywhere",
@@ -147,7 +151,9 @@
     "no_accommodation_description": "We couldn't find any accommodation in {location} during your selected time period.",
     "try_again": "Try again",
     "found_accommodations": "{count} accommodations in {location}",
-    "stays_in_selected_map_area": "Stays in selected map area"
+    "stays_in_selected_map_area": "Stays in selected map area",
+    "accommodation_list": "Accommodation list",
+    "map_area": "Map area"
   },
   "RoomCard": {
     "guest_favorite": "Guest favorite",
@@ -230,5 +236,35 @@
       "title": "Comments",
       "userAvatarAlt": "User profile photo"
     }
+  },
+  "Info": {
+    "no_room": "No room data available.",
+    "no_map": "No map data available.",
+    "coordinates_success": "The city coordinates were not found, the default coordinates are HCM",
+    "no_position": "Position data is incorrect, so it cannot be searched",
+    "sorry": "Sorry for the inconvenience",
+    "contact": "Please contact us for support"
+  },
+  "ValidationErrors": {
+    "requiredLocation": "Please enter a location",
+    "invalidCheckIn": "Check-in date cannot be before today",
+    "requiredCheckIn": "Please select a check-in date",
+    "requiredCheckOut": "Please select a check-out date",
+    "invalidCheckOut": "Check-out date must be after check-in date",
+    "invalidGuests": "Number of guests must be greater than 0",
+    "requiredRoomId": "Please select a room",
+    "requiredUserId": "Please log in to book",
+    "requiredCommentUser": "Please log in to comment",
+    "invalidCommentDate": "Invalid comment date",
+    "requiredCommentContent": "Comment content cannot be empty",
+    "invalidStarRating": "Rating must be between 1 and 5",
+    "invalidEmail": "Please enter a valid email",
+    "requiredPassword": "Please enter a password",
+    "requiredName": "Please enter a name",
+    "invalidPhone": "Please enter a valid phone number",
+    "invalidBirthdayFormat": "Birthday must be in dd/mm/yyyy format",
+    "invalidBirthday": "Birthday must be valid, after 1900 and before today",
+    "requiredGender": "Please select a gender",
+    "passwordTooShort": "Password must be at least 6 characters"
   }
 }
