@@ -1,49 +1,50 @@
-import { useRef, useState } from "react";
-import { useTranslations } from "next-intl";
-import { useDispatch } from "react-redux";
-import { useTheme } from "next-themes";
-import { useClickAway, useLocalStorage, useMedia, useToggle } from "react-use";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useDispatch } from 'react-redux';
+import { useTheme } from 'next-themes';
+import { useClickAway, useLocalStorage, useMedia, useToggle } from 'react-use';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { AnimatePresence, motion } from "framer-motion";
-import { Menu as MenuIcon, Moon, Sun, User, X } from "lucide-react";
-import Link from "next/link";
-import { MouseEvent } from "react";
-import MobileMenu from "./MobileMenu";
-import { clearUser } from "@/lib/client/store/slices/userSlice";
-import { clearSearch } from "@/lib/client/store/slices/searchSlice";
-import { showSuccessToast } from "@/lib/client/services/notificationService";
-import { User as UserType } from "@/lib/client/types/types";
-import LoginModal from "./LoginModal";
-import SignupModal from "./SignupModal";
-import ButtonLocale from "../common/button/ButtonLocale";
+} from '@/components/ui/dropdown-menu';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Menu as MenuIcon, Moon, Sun, User, X } from 'lucide-react';
+import Link from 'next/link';
+import { MouseEvent } from 'react';
+import MobileMenu from './MobileMenu';
+import { clearUser } from '@/lib/client/store/slices/userSlice';
+import { clearSearch } from '@/lib/client/store/slices/searchSlice';
+import { showSuccessToast } from '@/lib/client/services/notificationService';
+import { User as UserType } from '@/lib/client/types/types';
+import LoginModal from './LoginModal';
+import SignupModal from './SignupModal';
+import ButtonLocale from '../common/button/ButtonLocale';
 
 export default function Menu() {
   const { theme, setTheme } = useTheme();
-  const t = useTranslations("Header");
-  const tToast = useTranslations("Toast");
+  const t = useTranslations('Header');
+  const tToast = useTranslations('Toast');
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [visible, setVisible] = useToggle(false);
-  const isMobile = useMedia("(max-width: 768px)", true);
+  const isMobile = useMedia('(max-width: 768px)', true);
   const [user, setUser, removeUser] = useLocalStorage<UserType | null>(
-    "user",
+    'user',
     null
   );
   const [, setAuthToken, removeAuthToken] = useLocalStorage<string | null>(
-    "authToken",
+    'authToken',
     null
   );
 
   const userName = user?.name;
   const userAvatar = user?.avatar;
+  const userRole = user?.role;
 
   useClickAway(dropdownRef, () => {
     setDropdownOpen(false);
@@ -52,14 +53,14 @@ export default function Menu() {
   const handleSignInSuccess = (data: { token: string; user: UserType }) => {
     setAuthToken(data.token);
     setUser(data.user);
-    showSuccessToast(tToast("Login success"));
+    showSuccessToast(tToast('Login success'));
     setShowLoginModal(false);
   };
 
   const handleSignUpSuccess = (data: { token: string; user: UserType }) => {
     setAuthToken(data.token);
     setUser(data.user);
-    showSuccessToast(tToast("Signup success"));
+    showSuccessToast(tToast('Signup success'));
     setShowSignupModal(false);
   };
 
@@ -71,7 +72,7 @@ export default function Menu() {
     setUser(null);
     setAuthToken(null);
     setDropdownOpen(false);
-    showSuccessToast(tToast("Logout success"));
+    showSuccessToast(tToast('Logout success'));
   };
 
   const handleOpenLoginModal = (e: MouseEvent) => {
@@ -105,11 +106,11 @@ export default function Menu() {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         className="text-gray-700 dark:text-gray-300 hover:bg-transparent dark:hover:bg-transparent rounded-full transition-colors cursor-pointer"
         aria-label="Toggle theme"
       >
-        {theme === "dark" ? (
+        {theme === 'dark' ? (
           <Sun className="h-5 w-5 text-white" />
         ) : (
           <Moon className="h-5 w-5 text-white" />
@@ -136,7 +137,7 @@ export default function Menu() {
                 )}
               </Avatar>
               <span className="font-medium text-sm text-white">
-                {userName || t("Account")}
+                {userName || t('Account')}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -150,7 +151,7 @@ export default function Menu() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
                 className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
               >
                 {userName ? (
@@ -159,13 +160,21 @@ export default function Menu() {
                       href="/under-dev"
                       className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
-                      {t("Profile")}
+                      {t('Profile')}
                     </Link>
+                    {userRole === 'ADMIN' && (
+                      <Link
+                        href="/admin"
+                        className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
+                      >
+                        {t('Admin Page')}
+                      </Link>
+                    )}
                     <Link
                       href="/under-dev"
                       className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
-                      {t("Settings")}
+                      {t('Settings')}
                     </Link>
                     <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                     <Button
@@ -173,7 +182,7 @@ export default function Menu() {
                       className="w-full inline-block text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                       onClick={handleLogout}
                     >
-                      {t("Logout")}
+                      {t('Logout')}
                     </Button>
                   </>
                 ) : (
@@ -183,14 +192,14 @@ export default function Menu() {
                       onClick={handleOpenLoginModal}
                       className="w-full inline-block text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
-                      {t("Login")}
+                      {t('Login')}
                     </Button>
                     <Button
                       variant="ghost"
                       onClick={handleOpenSignupModal}
                       className="w-full inline-block text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
-                      {t("Signup")}
+                      {t('Signup')}
                     </Button>
                   </>
                 )}
