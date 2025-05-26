@@ -5,7 +5,7 @@ import useApi from '@/lib/client/services/useAPI';
 import { fetchPosition } from '@/lib/client/services/apiService';
 import { setPositions } from '@/lib/client/store/slices/positionSlice';
 import SearchPanelMobile from './SearchPanelMobile';
-import SearchPanel from './SearchPanel';
+import SearchPanel from './searchPanel';
 import { mapPositionWithSlug } from '@/lib/utils';
 import EmptyState from '../common/EmptyState';
 import { useTranslations } from 'next-intl';
