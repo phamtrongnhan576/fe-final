@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useDispatch } from 'react-redux';
 import { useTheme } from 'next-themes';
-import { useClickAway, useLocalStorage, useMedia, useToggle } from 'react-use';
+import { useClickAway, useLocalStorage, useToggle } from 'react-use';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +21,6 @@ import { User as UserType } from '@/lib/client/types/types';
 import LoginModal from './LoginModal';
 import SignupModal from './SignupModal';
 import ButtonLocale from '../common/button/ButtonLocale';
-
 export default function Menu() {
   const { theme, setTheme } = useTheme();
   const t = useTranslations('Header');
@@ -32,7 +31,6 @@ export default function Menu() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [visible, setVisible] = useToggle(false);
-  const isMobile = useMedia('(max-width: 768px)', true);
   const [user, setUser, removeUser] = useLocalStorage<UserType | null>(
     'user',
     null
@@ -42,9 +40,9 @@ export default function Menu() {
     null
   );
 
-  const userName = user?.name;
-  const userAvatar = user?.avatar;
-  const userRole = user?.role;
+  const userName = useMemo(() => user?.name, [user]);
+  const userAvatar = useMemo(() => user?.avatar, [user]);
+  const userRole = useMemo(() => user?.role, [user]);
 
   useClickAway(dropdownRef, () => {
     setDropdownOpen(false);
@@ -100,8 +98,8 @@ export default function Menu() {
   };
 
   return (
-    <div className="flex items-center">
-      {isMobile && <ButtonLocale className="text-sm text-white mr-2" />}
+    <div className="flex gap-4">
+      <ButtonLocale className="hidden lg:flex lg:items-center text-sm text-white" />
 
       <Button
         variant="ghost"
@@ -122,7 +120,7 @@ export default function Menu() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="gap-2 rounded-full hover:bg-transparent dark:hover:bg-transparent transition-colors px-3 py-1 cursor-pointer"
+              className="gap-2 rounded-full hover:bg-transparent dark:hover:bg-transparent transition-colors px-3 py-1 cursor-pointer p-0"
               aria-haspopup="menu"
               aria-expanded={dropdownOpen}
               aria-controls="user-menu-dropdown"
@@ -136,7 +134,7 @@ export default function Menu() {
                   </div>
                 )}
               </Avatar>
-              <span className="font-medium text-sm text-white">
+              <span className="font-medium text-sm text-white capitalize">
                 {userName || t('Account')}
               </span>
             </Button>
@@ -157,7 +155,7 @@ export default function Menu() {
                 {userName ? (
                   <>
                     <Link
-                      href="/under-dev"
+                      href="/info-user"
                       className="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-sm cursor-pointer"
                     >
                       {t('Profile')}

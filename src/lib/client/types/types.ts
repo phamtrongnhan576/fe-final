@@ -69,7 +69,7 @@ export interface Comment {
 export interface PostComment {
   maPhong: number;
   maNguoiBinhLuan: number;
-  ngayBinhLuan: Date;
+  ngayBinhLuan: string;
   noiDung: string;
   saoBinhLuan: number;
 }
@@ -98,6 +98,14 @@ export interface User {
   avatar: string;
   gender: boolean;
   role: string;
+}
+
+export interface UpdateUser {
+  name: string;
+  email: string;
+  phone: string;
+  birthday: string;
+  gender: boolean;
 }
 
 export interface Booking {
@@ -150,6 +158,10 @@ export interface CommentType {
   ngayBinhLuan: Date;
   noiDung: string;
   saoBinhLuan: number;
+}
+
+export interface AvatarForm {
+  avatar: FileList;
 }
 
 

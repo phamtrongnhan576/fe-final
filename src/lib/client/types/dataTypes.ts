@@ -4,7 +4,7 @@ import { LucideProps } from 'lucide-react';
 import { Wifi, Tv, ParkingSquare } from 'lucide-react';
 import { MdIron } from 'react-icons/md';
 import { FaHandsWash, FaSwimmingPool } from 'react-icons/fa';
-import { Coordinates } from './types';
+import { Coordinates, UpdateUser } from './types';
 
 export type NavItem = {
   key: string;
@@ -124,4 +124,12 @@ export const botResponses = [
 export const DEFAULT_COORDINATES: Coordinates = {
   latitude: 10.7769,
   longitude: 106.7009,
+};
+
+export const DEFAULT_UPDATE_USER_DATA: UpdateUser = {
+  name: '',
+  email: '',
+  phone: '',
+  birthday: '',
+  gender: true,
 };

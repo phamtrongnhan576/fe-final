@@ -1,39 +1,24 @@
-"use client";
+'use client';
 
-import Footer from "@/components/client/footer";
-import Header from "@/components/client/header";
-import FilterRoom from "@/components/client/rooms/FilterRoom";
-import Search from "@/components/client/search";
-import { ToastContainer } from "react-toastify";
-import AOSInitializer from "@/lib/client/providers/AOSInitializer";
-import { ReactNode } from "react";
-import Banner from "@/components/client/banner";
-import { usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
-import SubBanner from "@/components/client/banner/SubBanner";
+import Footer from '@/components/client/footer';
+import Header from '@/components/client/header';
+import { ToastContainer } from 'react-toastify';
+import AOSInitializer from '@/lib/client/providers/AOSInitializer';
+import { ReactNode } from 'react';
+import FloatingChatbox from '@/components/client/chatbox/FloatingChatbox';
+import BackToTop from '@/components/client/common/button/BackToTop';
+import useInitializeUser from '@/components/client/hooks/useInitializeUser';
 
-export default function HomeLayout({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const locale = useLocale();
-
-  const isHomePage = pathname === `/${locale}`;
+export default function ClientLayout({ children }: { children: ReactNode }) {
+  useInitializeUser();
   return (
     <>
+      <BackToTop />
+      <FloatingChatbox />
+      <ToastContainer />
       <AOSInitializer />
       <Header />
-      {isHomePage ? (
-        <>
-          <Banner />
-        </>
-      ) : (
-        <SubBanner />
-      )}
-      <Search />
-      <FilterRoom />
-      <main>
-        {children}
-        <ToastContainer />
-      </main>
+      <main>{children}</main>
       <Footer />
     </>
   );

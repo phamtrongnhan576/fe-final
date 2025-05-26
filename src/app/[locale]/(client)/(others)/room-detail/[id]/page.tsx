@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
 import {
   getCommentsById,
   getRoomsById,
-} from "@/lib/client/services/apiService";
-import { sortCommentsByIdDescending } from "@/lib/utils";
-import CommentsSection from "@/components/client/rooms/CommentsSection";
-import RoomHeader from "@/components/client/room-detail/RoomHeader";
-import RoomDetails from "@/components/client/room-detail/RoomDetails";
-import BookingForm from "@/components/client/room-detail/BookingForm";
-import RoomAmenities from "@/components/client/room-detail/RoomAmenities";
-import CommentForm from "@/components/client/room-detail/CommentForm";
-import RoomImage from "@/components/client/room-detail/RoomImage";
-import useApi from "@/lib/client/services/useAPI";
-import { useParams } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import EmptyState from "@/components/client/common/EmptyState";
-import { useMemo } from "react";
+} from '@/lib/client/services/apiService';
+import { sortCommentsByIdDescending } from '@/lib/utils';
+import CommentsSection from '@/components/client/rooms/CommentsSection';
+import RoomHeader from '@/components/client/room-detail/RoomHeader';
+import RoomDetails from '@/components/client/room-detail/RoomDetails';
+import BookingForm from '@/components/client/room-detail/BookingForm';
+import RoomAmenities from '@/components/client/room-detail/RoomAmenities';
+import CommentForm from '@/components/client/room-detail/CommentForm';
+import RoomImage from '@/components/client/room-detail/RoomImage';
+import useApi from '@/lib/client/services/useAPI';
+import { useParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/components/client/common/EmptyState';
+import { useMemo } from 'react';
 
 const LoadingSkeleton = () => (
   <div className="max-w-md md:container mx-auto py-5 space-y-5">
@@ -35,8 +35,8 @@ const LoadingSkeleton = () => (
 export default function RoomDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const keyRoom = id ? `/room/${id}` : "";
-  const keyComments = id ? `comments/${id}` : "";
+  const keyRoom = id ? `/room/${id}` : '';
+  const keyComments = id ? `comments/${id}` : '';
 
   const {
     data: room,

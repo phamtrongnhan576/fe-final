@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { Position } from "@/lib/client/types/types";
 import { useTranslations } from "next-intl";
 import SuggestionItem from "./SuggestionItem";
-import { highlightText } from "./highlightText";
 import { isValidUrl } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
@@ -61,7 +60,6 @@ const SuggestionsList = ({
         position={position}
         onSelect={() => onSelect(position)}
         searchTerm={searchTerm}
-        highlightText={highlightText}
         isValidUrl={isValidUrl}
       />
     ));

@@ -4,25 +4,25 @@ import {
   DialogContent,
   Dialog,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Position, SearchType } from "@/lib/client/types/types";
-import { UseFormReturn } from "react-hook-form";
+} from '@/components/ui/dialog';
+import { Position, SearchType } from '@/lib/client/types/types';
+import { UseFormReturn } from 'react-hook-form';
 import {
   FormField,
   FormItem,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import { useState, useCallback } from "react";
-import { useDebounce } from "react-use";
-import { useTranslations } from "next-intl";
-import { normalizeText } from "@/lib/utils";
-import { useFilteredPositions } from "../../hooks/useFilteredPositions.search";
-import SuggestionsList from "../../common/search/SuggestionsList";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { useDebounce } from 'react-use';
+import { useTranslations } from 'next-intl';
+import { normalizeText } from '@/lib/utils';
+import { useFilteredPositions } from '../../hooks/useFilteredPositions.search';
+import SuggestionsList from '../../common/search/SuggestionsList';
 
 const LocationDialog = ({
   showLocationModal,
@@ -39,16 +39,16 @@ const LocationDialog = ({
   setShowSuggestions: (value: boolean) => void;
   positions: Position[];
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const t = useTranslations("Search");
+  const [searchValue, setSearchValue] = useState('');
+  const t = useTranslations('Search');
 
   const filteredPositions = useFilteredPositions({
     positions,
     searchTerm,
     maxResults: 10,
-    searchFields: ["tenViTri", "tinhThanh"],
+    searchFields: ['tenViTri', 'tinhThanh'],
   });
 
   const handleInputChange = (value: string) => {
@@ -57,15 +57,15 @@ const LocationDialog = ({
   };
 
   const handlePositionSelect = (position: Position) => {
-    form.setValue("location", position.tinhThanh);
+    form.setValue('location', position.tinhThanh);
     setShowSuggestions(false);
     setShowLocationModal(false);
   };
 
-  const handleClearInput = useCallback(() => {
-    form.setValue("location", "");
-    setSearchValue("");
-  }, [form]);
+  const handleClearInput = () => {
+    form.setValue('location', '');
+    setSearchValue('');
+  };
 
   useDebounce(
     () => {
@@ -81,10 +81,10 @@ const LocationDialog = ({
       <DialogContent className="rounded-lg max-w-xl max-h-[80vh] overflow-y-none">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            {t("Where are you going?")}
+            {t('Where are you going?')}
           </DialogTitle>
           <DialogDescription className="text-gray-500 dark:text-white">
-            {t("Please select the location you want to go")}
+            {t('Please select the location you want to go')}
           </DialogDescription>
         </DialogHeader>
         <div className="relative">
@@ -98,7 +98,7 @@ const LocationDialog = ({
                     <Input
                       {...field}
                       id="location-input"
-                      placeholder={t("Search location")}
+                      placeholder={t('Search location')}
                       onClick={() => setShowSuggestions(true)}
                       onChange={(e) => {
                         field.onChange(e.target.value);
@@ -143,9 +143,9 @@ const LocationDialog = ({
                   searchTerm={searchTerm}
                   onSelect={handlePositionSelect}
                   emptyStateMessage={{
-                    noData: t("No data"),
-                    loading: t("Loading"),
-                    noResults: t("No results"),
+                    noData: t('No data'),
+                    loading: t('Loading'),
+                    noResults: t('No results'),
                   }}
                 />
               </motion.div>

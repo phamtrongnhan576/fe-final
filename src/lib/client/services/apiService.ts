@@ -1,11 +1,23 @@
-import axiosInstance from "./axiosInstance";
-import { Comment, defaultRoom, Position, PostComment, Room, SignIn, SignUp, User, Booking, Coordinates } from "../types/types";
-import axios from "axios";
-import { DEFAULT_COORDINATES } from "../types/dataTypes";
+import axiosInstance from './axiosInstance';
+import {
+  Comment,
+  defaultRoom,
+  Position,
+  PostComment,
+  Room,
+  SignIn,
+  SignUp,
+  User,
+  Booking,
+  Coordinates,
+  UpdateUser,
+} from '../types/types';
+import axios from 'axios';
+import { DEFAULT_COORDINATES } from '../types/dataTypes';
 
 export async function fetchPosition(): Promise<Position[]> {
   try {
-    const response = await axiosInstance.get("/api/vi-tri");
+    const response = await axiosInstance.get('/api/vi-tri');
     return Array.isArray(response.data.content) ? response.data.content : [];
   } catch (error) {
     throw error;
@@ -13,15 +25,17 @@ export async function fetchPosition(): Promise<Position[]> {
 }
 
 export async function getPositionByPagination(
-  pageIndex: string = "1",
-  pageSize: string = "8",
-  keyword: string = ""
+  pageIndex: string = '1',
+  pageSize: string = '8',
+  keyword: string = ''
 ): Promise<Position[]> {
   try {
     const response = await axiosInstance.get(
       `/api/vi-tri/phan-trang-tim-kiem?pageIndex=${pageIndex}&pageSize=${pageSize}&keyword=${keyword}`
     );
-    return Array.isArray(response.data.content.data) ? response.data.content.data : [];
+    return Array.isArray(response.data.content.data)
+      ? response.data.content.data
+      : [];
   } catch (error) {
     throw error;
   }
@@ -29,8 +43,11 @@ export async function getPositionByPagination(
 
 export async function getRoomsByPosition(maViTri: string): Promise<Room[]> {
   try {
-    if (!maViTri || maViTri.length === 0) throw new Error("Mã vị trí không hợp lệ");
-    const response = await axiosInstance.get(`/api/phong-thue/lay-phong-theo-vi-tri?maViTri=${maViTri}`);
+    if (!maViTri || maViTri.length === 0)
+      throw new Error('Mã vị trí không hợp lệ');
+    const response = await axiosInstance.get(
+      `/api/phong-thue/lay-phong-theo-vi-tri?maViTri=${maViTri}`
+    );
     return Array.isArray(response.data.content) ? response.data.content : [];
   } catch (error) {
     throw error;
@@ -39,9 +56,35 @@ export async function getRoomsByPosition(maViTri: string): Promise<Room[]> {
 
 export async function getRoomsById(id: string): Promise<Room> {
   try {
-    if (!id || id.length === 0) throw new Error("Mã phòng không hợp lệ");
+    if (!id || id.length === 0) throw new Error('Mã phòng không hợp lệ');
     const response = await axiosInstance.get(`/api/phong-thue/${id}`);
-    return response.data.content instanceof Object ? response.data.content : defaultRoom;
+    return response.data.content instanceof Object
+      ? response.data.content
+      : defaultRoom;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getRoomsByUserId(id: string): Promise<Room[]> {
+  try {
+    if (!id || id.length === 0) throw new Error('Mã người dùng không hợp lệ');
+    const response = await axiosInstance.get(
+      `/api/dat-phong/lay-theo-nguoi-dung/${id}`
+    );
+    return response.data.content instanceof Array
+      ? response.data.content
+      : defaultRoom;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getUserById(id: string): Promise<User> {
+  try {
+    if (!id || id.length === 0) throw new Error('Mã người dùng không hợp lệ');
+    const response = await axiosInstance.get(`/api/users/${id}`);
+    return response.data.content;
   } catch (error) {
     throw error;
   }
@@ -49,35 +92,11 @@ export async function getRoomsById(id: string): Promise<Room> {
 
 export async function getCommentsById(id: string): Promise<Comment[]> {
   try {
-    if (!id || id.length === 0) throw new Error("Mã phòng không hợp lệ");
-    const response = await axiosInstance.get(`/api/binh-luan/lay-binh-luan-theo-phong/${id}`);
+    if (!id || id.length === 0) throw new Error('Mã phòng không hợp lệ');
+    const response = await axiosInstance.get(
+      `/api/binh-luan/lay-binh-luan-theo-phong/${id}`
+    );
     return response.data.content instanceof Array ? response.data.content : [];
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function createComment(data: PostComment): Promise<void> {
-  try {
-    if (!data) throw new Error("Dữ liệu bình luận không hợp lệ");
-    const response = await axiosInstance.post(`/api/binh-luan`, data);
-    if (response.statusText !== "OK") {
-      throw new Error(response.data.message || "Không thể gửi bình luận");
-    }
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function createBooking(data: Booking): Promise<void> {
-  try {
-    if (!data) throw new Error("Dữ liệu đặt phòng không được để trống");
-
-    const response = await axiosInstance.post(`/api/dat-phong`, data);
-
-    if (response.data.statusCode !== 201) {
-      throw new Error(response.data.message || "Không thể đặt phòng");
-    }
   } catch (error) {
     throw error;
   }
@@ -85,23 +104,30 @@ export async function createBooking(data: Booking): Promise<void> {
 
 export async function getCoordinatesByCity(city: string): Promise<Coordinates> {
   try {
-    if (!city || city.trim().length === 0) throw new Error("Tên thành phố không được để trống");
+    if (!city || city.trim().length === 0)
+      throw new Error('Tên thành phố không được để trống');
 
-    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-      params: {
-        q: city,
-        format: 'json',
-        limit: 1,
-        countrycodes: 'vn',
+    const response = await axios.get(
+      'https://nominatim.openstreetmap.org/search',
+      {
+        params: {
+          q: city,
+          format: 'json',
+          limit: 1,
+          countrycodes: 'vn',
+        },
       }
-    });
+    );
 
-    const result = Array.isArray(response.data) && response.data.length > 0 ? response.data[0] : null;
+    const result =
+      Array.isArray(response.data) && response.data.length > 0
+        ? response.data[0]
+        : null;
 
     if (!result || !result.lat || !result.lon) {
       return {
         ...DEFAULT_COORDINATES,
-        messageKey: "coordinates_success",
+        messageKey: 'coordinates_success',
       };
     }
 
@@ -114,34 +140,96 @@ export async function getCoordinatesByCity(city: string): Promise<Coordinates> {
   }
 }
 
-export async function signIn(data: SignIn): Promise<{ token: string; user: User }> {
+export async function createComment(data: PostComment): Promise<void> {
   try {
-    const response = await axiosInstance.post(`/api/auth/signin`, data);
-
-    if (response.statusText === "OK") {
-      const token = response.data.content.token;
-      const user = response.data.content.user;
-
-      return { token, user };
-    } else {
-      throw new Error(response.data.message || "Không thể đăng nhập");
+    if (!data) throw new Error('Dữ liệu bình luận không hợp lệ');
+    const response = await axiosInstance.post(`/api/binh-luan`, data);
+    if (response.statusText !== 'OK') {
+      throw new Error(response.data.message || 'Không thể gửi bình luận');
     }
   } catch (error) {
     throw error;
   }
-} 
+}
 
-export async function signUp(data: SignUp): Promise<{ token: string; user: User }> {
+export async function updateAvatar(data: File): Promise<User> {
   try {
-    const response = await axiosInstance.post("/api/auth/signup", data);
+    if (!data) throw new Error('Dữ liệu không hợp lệ');
 
-    if (response.statusText === "OK") {
+    const formData = new FormData();
+    formData.append('formFile', data);
+
+    const response = await axiosInstance.post(
+      `/api/users/upload-avatar`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    return response.data.content;
+  } catch (error) {
+    console.error('Avatar upload error:', error);
+    throw error;
+  }
+}
+
+export async function updateUserProfile(data: UpdateUser, id: string): Promise<UpdateUser> {
+  try {
+    const response = await axiosInstance.put(`/api/users/${id}`, data);
+    return response.data.content;
+  } catch (error) {
+    throw error;
+  }
+}
+export async function createBooking(data: Booking): Promise<void> {
+  try {
+    if (!data) throw new Error('Dữ liệu đặt phòng không được để trống');
+
+    const response = await axiosInstance.post(`/api/dat-phong`, data);
+
+    if (response.data.statusCode !== 201) {
+      throw new Error(response.data.message || 'Không thể đặt phòng');
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function signIn(
+  data: SignIn
+): Promise<{ token: string; user: User }> {
+  try {
+    const response = await axiosInstance.post(`/api/auth/signin`, data);
+
+    if (response.statusText === 'OK') {
       const token = response.data.content.token;
       const user = response.data.content.user;
 
       return { token, user };
     } else {
-      throw new Error(response.data.message || "Không thể đăng ký");
+      throw new Error(response.data.message || 'Không thể đăng nhập');
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function signUp(
+  data: SignUp
+): Promise<{ token: string; user: User }> {
+  try {
+    const response = await axiosInstance.post('/api/auth/signup', data);
+
+    if (response.statusText === 'OK') {
+      const token = response.data.content.token;
+      const user = response.data.content.user;
+
+      return { token, user };
+    } else {
+      throw new Error(response.data.message || 'Không thể đăng ký');
     }
   } catch (error) {
     throw error;

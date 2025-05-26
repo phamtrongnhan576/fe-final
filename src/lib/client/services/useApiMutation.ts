@@ -1,6 +1,6 @@
-import useSWRMutation from "swr/mutation";
-import { AxiosError } from "axios";
-import { handleApiError } from "@/lib/client/services/notificationService";
+import useSWRMutation from 'swr/mutation';
+import { AxiosError } from 'axios';
+import { handleApiError } from '@/lib/client/services/notificationService';
 
 export default function useApiMutation<T, D>(
   key: string,
@@ -14,7 +14,7 @@ export default function useApiMutation<T, D>(
     {
       onError: (error: AxiosError) => {
         handleApiError(error);
-      }
+      },
     }
   );
 }

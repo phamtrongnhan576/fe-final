@@ -1,10 +1,13 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Home } from "lucide-react";
-import Link from "next/link";
+import { motion } from 'framer-motion';
+import { Home } from 'lucide-react';
+import Link from 'next/link';
+import BulbIcon from '@/components/client/icons/BulbIcon';
+import { useTranslations } from 'next-intl';
 
 export default function UnderDevelopmentPage() {
+  const t = useTranslations('UnderDev');
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-2xl dark:bg-gray-800 text-center">
@@ -12,37 +15,24 @@ export default function UnderDevelopmentPage() {
           <motion.div
             animate={{
               rotate: [0, 10, -10, 0],
-              y: [0, -10, 0]
+              y: [0, -10, 0],
             }}
             transition={{
               repeat: Infinity,
               duration: 2,
-              ease: "easeInOut"
+              ease: 'easeInOut',
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-16 w-16 text-rose-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              />
-            </svg>
+            <BulbIcon />
           </motion.div>
         </div>
 
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-          Đang Xây Dựng
+          {t('title')}
         </h1>
 
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Chúng tôi đang nỗ lực để hoàn thiện tính năng này. Vui lòng quay lại sau!
+          {t('description')}
         </p>
 
         <motion.div
@@ -55,10 +45,10 @@ export default function UnderDevelopmentPage() {
             className="px-6 py-3 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-lg transition-colors duration-200 inline-flex items-center"
           >
             <Home className="w-5 h-5 mr-2" />
-            Quay Về Trang Chủ
+            {t('backHome')}
           </Link>
         </motion.div>
       </div>
     </div>
   );
-};
+}

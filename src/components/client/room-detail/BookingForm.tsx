@@ -1,36 +1,36 @@
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { showSuccessToast } from "@/lib/client/services/notificationService";
-import { createBooking } from "@/lib/client/services/apiService";
+} from '@/components/ui/popover';
+import { showSuccessToast } from '@/lib/client/services/notificationService';
+import { createBooking } from '@/lib/client/services/apiService';
 import {
   handleApiError,
   showErrorToast,
-} from "@/lib/client/services/notificationService";
-import { RootState } from "@/lib/client/store/store";
-import { BookingType, Comment, Room } from "@/lib/client/types/types";
-import { AxiosError } from "axios";
-import { convertUSDToVND, formatDate } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Minus, Plus, Star } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { useForm, useFormContext, UseFormReturn } from "react-hook-form";
-import { useSelector } from "react-redux";
-import { useTranslations } from "next-intl";
-import { useLocale } from "next-intl";
-import { createSchemas } from "@/lib/client/validator/validatior";
+} from '@/lib/client/services/notificationService';
+import { BookingType, Comment, Room } from '@/lib/client/types/types';
+import { AxiosError } from 'axios';
+import { convertUSDToVND, formatDate } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CalendarIcon, FlagIcon, Minus, Plus, Star } from 'lucide-react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
+import { useForm, useFormContext, UseFormReturn } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { createSchemas } from '@/lib/client/validator/validatior';
+import { User as UserType } from '@/lib/client/types/types';
+import { useLocalStorage } from 'react-use';
 
 type BookingFormProps = {
   room: Room;
@@ -47,11 +47,13 @@ type PriceSummaryProps = {
 export default function BookingForm({ room, comments }: BookingFormProps) {
   const pricePerNight = room.giaTien;
   const cleaningFee = 8;
-  const user = useSelector((state: RootState) => state.user);
-  const t = useTranslations("RoomDetail");
-  const tValidation = useTranslations("ValidationErrors");
+  const [user] = useLocalStorage<UserType | null>('user', null);
+  const t = useTranslations('RoomDetail');
+  const tValidation = useTranslations('ValidationErrors');
   const locale = useLocale();
   const schemas = createSchemas(tValidation);
+
+  const userID = useMemo(() => user?.id, [user]);
 
   const form = useForm<BookingType>({
     resolver: zodResolver(schemas.bookingSchema),
@@ -66,8 +68,8 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
   });
 
   const calculateNights = () => {
-    const checkIn = form.watch("ngayDen");
-    const checkOut = form.watch("ngayDi");
+    const checkIn = form.watch('ngayDen');
+    const checkOut = form.watch('ngayDi');
     if (checkIn && checkOut) {
       const diffTime = checkOut.getTime() - checkIn.getTime();
       return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -89,8 +91,8 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
 
   const onSubmit = async (data: BookingType) => {
     try {
-      if (!user.id) {
-        showErrorToast(t("loginRequired"));
+      if (!userID) {
+        showErrorToast(t('loginRequired'));
         return;
       }
 
@@ -98,11 +100,11 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
         ...data,
         ngayDen: data.ngayDen.toISOString(),
         ngayDi: data.ngayDi.toISOString(),
-        maNguoiDung: user.id,
+        maNguoiDung: userID,
       };
 
       await createBooking(bookingData);
-      showSuccessToast(t("bookingSuccess"));
+      showSuccessToast(t('bookingSuccess'));
     } catch (error) {
       console.log(error);
       handleApiError(error as AxiosError);
@@ -115,10 +117,10 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
         <div className="flex flex-wrap justify-between items-center gap-3">
           <div>
             <span className="font-bold">
-              {locale !== "vi" && "$"}
+              {locale !== 'vi' && '$'}
               {convertUSDToVND(pricePerNight)}
-            </span>{" "}
-            {t("perNight")}
+            </span>{' '}
+            {t('perNight')}
           </div>
           <div>
             <span className="space-x-2 flex items-center justify-center">
@@ -127,7 +129,7 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
                 {calculateAverageRating()}
               </span>
               <span className="text-gray-600 hover:text-rose-600 duration-300 dark:text-white">
-                ({comments.length}) {t("reviews")}
+                ({comments.length}) {t('reviews')}
               </span>
             </span>
           </div>
@@ -141,13 +143,13 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
               type="submit"
               className="bg-rose-600 w-full py-3 rounded-lg font-bold text-white hover:bg-rose-700 cursor-pointer"
             >
-              {t("checkAvailability")}
+              {t('checkAvailability')}
             </Button>
           </form>
         </Form>
 
         <p className="text-center text-gray-400 dark:text-white">
-          {t("notChargedYet")}
+          {t('notChargedYet')}
         </p>
         <PriceSummary
           price={pricePerNight}
@@ -157,21 +159,12 @@ export default function BookingForm({ room, comments }: BookingFormProps) {
         />
       </div>
       <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-        <svg
-          viewBox="0 0 16 16"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-          role="presentation"
-          focusable="false"
-          className="h-4 w-4 fill-current dark:text-white"
-        >
-          <path d="m7.5011 1c.5272 0 .9591.40794.99725.92537l.00275.07463v1h5.5c.31265 0 .5435.281645.4935.581075l-.01275.056285-.96125 3.36264.96125 3.36265c.08055.2818-.0967.5625-.36775.62465l-.0554.00945-.0576.00325h-5.5c-.5272 0-.9591-.40795-.99725-.92535l-.00275-.07465v-1h-5v6h-1v-14zm1 3h-1v4h1z" />
-        </svg>
+        <FlagIcon />
         <Link
           href="/under-dev"
           className="underline hover:text-rose-600 dark:text-white"
         >
-          {t("reportListing")}
+          {t('reportListing')}
         </Link>
       </div>
     </div>
@@ -182,12 +175,12 @@ function DatePicker() {
   const form = useFormContext<BookingType>();
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
-  const t = useTranslations("RoomDetail");
+  const t = useTranslations('RoomDetail');
 
   return (
     <div className="grid grid-cols-2 gap-2 border-b pb-4 dark:border-gray-500">
       <div>
-        <label className="text-sm font-medium">{t("checkIn")}</label>
+        <label className="text-sm font-medium">{t('checkIn')}</label>
         <FormField
           control={form.control}
           name="ngayDen"
@@ -204,7 +197,7 @@ function DatePicker() {
                       <span className="text-gray-700 dark:text-white">
                         {field.value
                           ? formatDate(field.value)
-                          : t("selectCheckInDate")}
+                          : t('selectCheckInDate')}
                       </span>
                     </Button>
                   </PopoverTrigger>
@@ -223,28 +216,28 @@ function DatePicker() {
                       className="dark:bg-gray-800 dark:border-gray-700 dark:border-1 rounded-lg"
                       classNames={{
                         // Header (caption)
-                        caption: "flex justify-center items-center relative",
+                        caption: 'flex justify-center items-center relative',
                         caption_label:
-                          "text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default",
+                          'text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default',
                         // Navigation buttons (Previous/Next)
-                        nav: "flex items-center",
+                        nav: 'flex items-center',
                         nav_button:
-                          "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer",
-                        nav_button_previous: "absolute left-2",
-                        nav_button_next: "absolute right-2",
+                          'w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer',
+                        nav_button_previous: 'absolute left-2',
+                        nav_button_next: 'absolute right-2',
                         // Weekday headers (Mon, Tue,...)
                         head_cell:
-                          "text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2",
+                          'text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2',
                         // Calendar grid
-                        row: "flex gap-1 mt-1",
+                        row: 'flex gap-1 mt-1',
                         // Normal day
-                        day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700",
+                        day: 'w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700',
                         // Selected day
                         day_selected:
-                          "bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800",
+                          'bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800',
                         // Today
                         day_today:
-                          "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700",
+                          'border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700',
                       }}
                     />
                   </PopoverContent>
@@ -256,7 +249,7 @@ function DatePicker() {
         />
       </div>
       <div>
-        <label className="text-sm font-medium">{t("checkOut")}</label>
+        <label className="text-sm font-medium">{t('checkOut')}</label>
         <FormField
           control={form.control}
           name="ngayDi"
@@ -273,7 +266,7 @@ function DatePicker() {
                       <span className="text-gray-700 dark:text-white">
                         {field.value
                           ? formatDate(field.value)
-                          : t("selectCheckOutDate")}
+                          : t('selectCheckOutDate')}
                       </span>
                     </Button>
                   </PopoverTrigger>
@@ -286,35 +279,35 @@ function DatePicker() {
                         setIsCheckOutOpen(false);
                       }}
                       disabled={(date) =>
-                        date <= form.watch("ngayDen") ||
+                        date <= form.watch('ngayDen') ||
                         date < new Date(new Date().setHours(0, 0, 0, 0))
                       }
                       initialFocus
                       className="dark:bg-gray-800 dark:border-gray-700 dark:border-1 rounded-lg"
                       classNames={{
                         // Header (caption)
-                        caption: "flex justify-center items-center relative",
+                        caption: 'flex justify-center items-center relative',
                         caption_label:
-                          "text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default",
+                          'text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default',
                         // Navigation buttons (Previous/Next)
-                        nav: "flex items-center",
+                        nav: 'flex items-center',
                         nav_button:
-                          "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer",
-                        nav_button_previous: "absolute left-2",
-                        nav_button_next: "absolute right-2",
+                          'w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer',
+                        nav_button_previous: 'absolute left-2',
+                        nav_button_next: 'absolute right-2',
                         // Weekday headers (Mon, Tue,...)
                         head_cell:
-                          "text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2",
+                          'text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2',
                         // Calendar grid
-                        row: "flex gap-1 mt-1",
+                        row: 'flex gap-1 mt-1',
                         // Normal day
-                        day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700",
+                        day: 'w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700',
                         // Selected day
                         day_selected:
-                          "bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800",
+                          'bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800',
                         // Today
                         day_today:
-                          "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700",
+                          'border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700',
                       }}
                     />
                   </PopoverContent>
@@ -331,11 +324,11 @@ function DatePicker() {
 
 function GuestCounter({ form }: { form: UseFormReturn<BookingType> }) {
   const maxGuests = 10;
-  const t = useTranslations("RoomDetail");
+  const t = useTranslations('RoomDetail');
 
   return (
     <div className="p-3 border-2 border-gray-600 rounded-lg">
-      <div className="mb-3 font-bold">{t("guests")}</div>
+      <div className="mb-3 font-bold">{t('guests')}</div>
       <FormField
         control={form.control}
         name="soLuongKhach"
@@ -353,7 +346,7 @@ function GuestCounter({ form }: { form: UseFormReturn<BookingType> }) {
                   <Minus />
                 </Button>
                 <span>
-                  {field.value} {t("guestCount")}
+                  {field.value} {t('guestCount')}
                 </span>
                 <Button
                   type="button"
@@ -380,33 +373,33 @@ function PriceSummary({
   cleaningFee,
   total,
 }: PriceSummaryProps) {
-  const t = useTranslations("RoomDetail");
+  const t = useTranslations('RoomDetail');
   const locale = useLocale();
 
   return (
     <>
       <div className="flex justify-between items-center">
         <p className="text-base">
-          {locale !== "vi" && "$"}
-          {convertUSDToVND(price)} X {nights} {t("nights")}
+          {locale !== 'vi' && '$'}
+          {convertUSDToVND(price)} X {nights} {t('nights')}
         </p>
         <p className="font-mono text-lg font-bold">
-          {locale !== "vi" && "$"}
+          {locale !== 'vi' && '$'}
           {convertUSDToVND(price * nights)}
         </p>
       </div>
       <div className="flex justify-between items-center">
-        <p className="text-base">{t("cleaningFee")}</p>
+        <p className="text-base">{t('cleaningFee')}</p>
         <p className="font-mono text-lg font-bold">
-          {locale !== "vi" && "$"}
+          {locale !== 'vi' && '$'}
           {convertUSDToVND(cleaningFee)}
         </p>
       </div>
       <div className="mb-5 w-full h-px bg-gray-300 dark:bg-gray-500"></div>
       <div className="flex justify-between items-center">
-        <p className="font-bold text-lg">{t("totalBeforeTaxes")}</p>
+        <p className="font-bold text-lg">{t('totalBeforeTaxes')}</p>
         <p className="font-mono text-lg font-bold">
-          {locale !== "vi" && "$"}
+          {locale !== 'vi' && '$'}
           {convertUSDToVND(total)}
         </p>
       </div>

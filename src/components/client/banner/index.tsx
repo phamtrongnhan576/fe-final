@@ -1,8 +1,8 @@
-import Image from "next/image";
-import { useTheme } from "next-themes";
-import { useTranslations } from "next-intl";
-import { useRef, RefObject } from "react";
-import { useDebounce, useIntersection } from "react-use";
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
+import { useRef, RefObject } from 'react';
+import { useDebounce, useIntersection } from 'react-use';
 
 export default function Banner() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -13,7 +13,7 @@ export default function Banner() {
     }
   );
   const { theme } = useTheme();
-  const t = useTranslations("Banner");
+  const t = useTranslations('Banner');
 
   const handleVideo = () => {
     const video = videoRef.current;
@@ -69,16 +69,16 @@ export default function Banner() {
           data-aos="fade-up"
           data-aos-delay="100"
         >
-          {t("Belong anywhere")}
+          {t('Belong anywhere')}
         </p>
       </div>
 
       <div className="absolute left-0 xl:left-[calc(50%-1920px/2)] bottom-0">
         <Image
           src={
-            theme === "dark"
-              ? "/swoosh-hero-dark.png"
-              : "/swoosh-hero-light.png"
+            theme === 'dark'
+              ? '/swoosh-hero-dark.png'
+              : '/swoosh-hero-light.png'
           }
           alt="Decorative swoosh pattern for Vietnam travel experience"
           width={1920}

@@ -1,12 +1,17 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 
-const isClient = typeof window !== "undefined";
+const isClient = typeof window !== 'undefined';
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 5000,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     TokenCybersoft: process.env.NEXT_PUBLIC_TOKEN_CYBERSOFT,
   },
 });
@@ -14,11 +19,11 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (isClient) {
-      const token = localStorage.getItem("authToken");
+      const token = JSON.parse(localStorage.getItem('authToken') || '');
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.token = token;
       } else {
-        delete config.headers.Authorization;
+        delete config.headers.token;
       }
     }
     return config;
@@ -32,7 +37,7 @@ axiosInstance.interceptors.response.use(
     if (error.response && isClient) {
       const { status } = error.response;
       if (status === 401) {
-        localStorage.removeItem("authToken");
+        localStorage.removeItem('authToken');
       }
     }
     return Promise.reject(error);

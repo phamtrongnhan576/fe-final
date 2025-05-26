@@ -27,7 +27,7 @@ export default function ButtonLocale({ className }: { className?: string }) {
         <Globe className="h-5 w-5" />
         <span>{tLocale("language")}</span>
       </PopoverTrigger>
-      <PopoverContent className="w-48 py-2 px-0 dark:bg-gray-900">
+      <PopoverContent className="w-48 py-2 px-0 dark:bg-gray-800">
         {languages.map((language) => (
           <div
             key={language.locale}

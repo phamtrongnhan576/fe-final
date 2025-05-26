@@ -4,6 +4,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { usePathname } from "next/navigation";
 import { NavItem, navItems } from "@/lib/client/types/dataTypes";
 import { getTranslatedItems } from "@/lib/utils";
+import ButtonLocale from "../common/button/ButtonLocale";
 
 interface MobileMenuProps {
   visible: boolean;
@@ -64,9 +65,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ visible, setVisible }) => {
       {visible && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
+          animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
           className="fixed inset-x-0 top-16 z-50 block overflow-hidden border-t border-gray-200 bg-white shadow-lg md:hidden dark:border-gray-700 dark:bg-gray-900"
           role="navigation"
           aria-label="Mobile site menu"
@@ -78,6 +79,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ visible, setVisible }) => {
             variants={containerVariants}
           >
             {translatedNavItems.map(renderMenuItem)}
+            <ButtonLocale className="text-sm text-white mr-2" />
           </motion.ul>
 
           <div className="px-6 pb-6">

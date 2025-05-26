@@ -1,51 +1,67 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Star, User } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { createComment } from "@/lib/client/services/apiService";
-import { handleApiError } from "@/lib/client/services/notificationService";
-import { AxiosError } from "axios";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/client/store/store";
-import { useTranslations } from "next-intl";
-import { CommentType } from "@/lib/client/types/types";
-import { createSchemas } from "@/lib/client/validator/validatior";
+} from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { Star, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useMemo, useState } from 'react';
+import { createComment } from '@/lib/client/services/apiService';
+import {
+  handleApiError,
+  showErrorToast,
+} from '@/lib/client/services/notificationService';
+import { AxiosError } from 'axios';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { useTranslations } from 'next-intl';
+import { CommentType, User as UserType } from '@/lib/client/types/types';
+import { createSchemas } from '@/lib/client/validator/validatior';
+import { useLocalStorage } from 'react-use';
 
 export default function CommentForm({ id }: { id: number }) {
-  const user = useSelector((state: RootState) => state.user);
-  const userAvatar = user.avatar;
-  const userName = user.name;
-  const t = useTranslations("RoomDetail");
-  const tValidation = useTranslations("ValidationErrors");
+  const [user] = useLocalStorage<UserType | null>('user', null);
+
+  const userAvatar = useMemo(() => user?.avatar, [user]);
+  const userName = useMemo(() => user?.name, [user]);
+  const userId = useMemo(() => user?.id, [user]) as number;
+
+  const t = useTranslations('RoomDetail');
+  const tValidation = useTranslations('ValidationErrors');
   const commentSchema = createSchemas(tValidation);
 
   const form = useForm<CommentType>({
     resolver: zodResolver(commentSchema.commentSchema),
     defaultValues: {
       maPhong: id,
-      maNguoiBinhLuan: 47042,
+      maNguoiBinhLuan: userId,
       ngayBinhLuan: new Date(Date.now()),
-      noiDung: "",
+      noiDung: '',
       saoBinhLuan: 0,
     },
   });
 
   const onSubmit = async (data: CommentType) => {
     try {
-      await createComment(data);
+      const formattedData = {
+        maPhong: id,
+        maNguoiBinhLuan: userId,
+        ngayBinhLuan: new Date(Date.now()).toISOString(),
+        noiDung: data.noiDung,
+        saoBinhLuan: data.saoBinhLuan,
+      };
+      await createComment(formattedData);
     } catch (error) {
-      handleApiError(error as AxiosError);
+      if (error instanceof AxiosError && error?.status === 403) {
+        showErrorToast(tValidation('needLogin'));
+      } else if (error instanceof AxiosError) {
+        handleApiError(error);
+      }
     }
   };
 
@@ -62,7 +78,7 @@ export default function CommentForm({ id }: { id: number }) {
           )}
         </Avatar>
         <span className="font-semibold text-sm text-gray-600 dark:text-white">
-          {userName || t("comment.defaultUsername")}
+          {userName || t('comment.defaultUsername')}
         </span>
       </div>
 
@@ -91,7 +107,7 @@ export default function CommentForm({ id }: { id: number }) {
                 <FormItem className="flex-1">
                   <FormControl>
                     <Textarea
-                      placeholder={t("comment.placeholder")}
+                      placeholder={t('comment.placeholder')}
                       className="min-h-20 max-h-60"
                       {...field}
                     />
@@ -105,7 +121,7 @@ export default function CommentForm({ id }: { id: number }) {
                 type="submit"
                 className="px-5 py-2 rounded-lg bg-rose-600 text-white duration-200 hover:bg-rose-700 cursor-pointer"
               >
-                {t("comment.submitButton")}
+                {t('comment.submitButton')}
               </Button>
             </div>
           </form>
@@ -131,10 +147,10 @@ const RatingStars = ({ value, onChange }: RatingStarsProps) => {
           <Star
             key={index}
             className={cn(
-              "h-6 w-6 cursor-pointer",
+              'h-6 w-6 cursor-pointer',
               starValue <= (hoverValue || value)
-                ? "fill-yellow-400 text-yellow-400"
-                : "text-gray-300"
+                ? 'fill-yellow-400 text-yellow-400'
+                : 'text-gray-300'
             )}
             onClick={() => onChange(starValue)}
             onMouseEnter={() => setHoverValue(starValue)}

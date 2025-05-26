@@ -1,12 +1,12 @@
-import { Position } from "@/lib/client/types/types";
-import { motion } from "framer-motion";
-import Image from "next/image";
+import { Position } from '@/lib/client/types/types';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { highlightText } from './highlightText';
 
 interface SuggestionItemProps {
   position: Position;
   onSelect: () => void;
   searchTerm: string;
-  highlightText: (text: string, searchTerm: string) => React.ReactNode;
   isValidUrl: (url: string) => boolean;
 }
 
@@ -14,7 +14,6 @@ const SuggestionItem = ({
   position,
   onSelect,
   searchTerm,
-  highlightText,
   isValidUrl,
 }: SuggestionItemProps) => {
   return (
@@ -31,7 +30,7 @@ const SuggestionItem = ({
       <div className="relative mr-3 h-12 w-12 overflow-hidden rounded-lg">
         <Image
           src={
-            isValidUrl(position.hinhAnh) ? position.hinhAnh : "/placeholder.svg"
+            isValidUrl(position.hinhAnh) ? position.hinhAnh : '/placeholder.svg'
           }
           alt={position.tenViTri}
           fill

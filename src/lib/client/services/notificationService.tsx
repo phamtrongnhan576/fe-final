@@ -1,6 +1,5 @@
-import { AxiosError } from "axios";
+import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-
 
 export const showSuccessToast = (message: string) => {
   toast.success(message, {
@@ -31,29 +30,34 @@ export const handleApiError = (error: Error | AxiosError) => {
     const response = error.response;
     const status = response?.status;
 
-    const errorMessage = response && typeof response.data === "object" && "content" in response.data && typeof response.data.content === "string" ? response.data.content : "Lỗi không xác định";
+    const errorMessage =
+      response &&
+      typeof response.data === 'object' &&
+      'content' in response.data &&
+      typeof response.data.content === 'string'
+        ? response.data.content
+        : 'Lỗi không xác định';
 
     switch (status) {
       case 400:
         showErrorToast(`Yêu cầu không hợp lệ: ${errorMessage}`);
         break;
       case 401:
-        showErrorToast("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+        showErrorToast('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
         break;
       case 403:
-        showErrorToast("Bạn không có quyền truy cập tài nguyên này");
+        showErrorToast('Bạn không có quyền truy cập tài nguyên này');
         break;
       case 404:
-        showErrorToast("Tài nguyên không tồn tại");
+        showErrorToast('Tài nguyên không tồn tại');
         break;
       case 500:
-        showErrorToast("Lỗi server, vui lòng thử lại sau");
+        showErrorToast('Lỗi server, vui lòng thử lại sau');
         break;
       default:
         showErrorToast(errorMessage);
         break;
     }
-
   } else {
     showErrorToast(error.message);
   }

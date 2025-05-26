@@ -1,6 +1,10 @@
-import ListRoom from "@/components/client/rooms/ListRoom";
+import ListRoom from '@/components/client/rooms/ListRoom';
 
-export default async function RoomsPage({ params }: { params: Promise<{ location: string }> }) {
+export default async function RoomsPage({
+  params,
+}: {
+  params: Promise<{ location: string }>;
+}) {
   const { location } = await params;
 
   return (

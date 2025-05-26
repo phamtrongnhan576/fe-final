@@ -1,22 +1,22 @@
-import { useRef, useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, User, Calendar as CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
+import { useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, X, User, Calendar as CalendarIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { formatDate } from "@/lib/utils";
-import { useForm } from "react-hook-form";
+} from '@/components/ui/popover';
+import { formatDate } from '@/lib/utils';
+import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -24,24 +24,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { useDebounce } from "react-use";
-import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
-import { setSearch } from "@/lib/client/store/slices/searchSlice";
+} from '@/components/ui/form';
+import { useClickAway, useDebounce } from 'react-use';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { setSearch } from '@/lib/client/store/slices/searchSlice';
 import {
   showErrorToast,
   showSuccessToast,
-} from "@/lib/client/services/notificationService";
-import { RootState } from "@/lib/client/store/store";
-import { useTranslations } from "next-intl";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createSchemas } from "@/lib/client/validator/validatior";
-import { Position, SearchType } from "@/lib/client/types/types";
-import { slugify } from "transliteration";
-import { useFilteredPositions } from "../../hooks/useFilteredPositions.search";
-import { normalizeText } from "@/lib/utils";
-import SuggestionsList from "../../common/search/SuggestionsList";
+} from '@/lib/client/services/notificationService';
+import { RootState } from '@/lib/client/store/store';
+import { useTranslations } from 'next-intl';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createSchemas } from '@/lib/client/validator/validatior';
+import { Position, SearchType } from '@/lib/client/types/types';
+import { slugify } from 'transliteration';
+import { useFilteredPositions } from '../../hooks/useFilteredPositions.search';
+import { normalizeText } from '@/lib/utils';
+import SuggestionsList from '../../common/search/SuggestionsList';
 
 interface SearchDialogProps {
   open: boolean;
@@ -50,9 +50,9 @@ interface SearchDialogProps {
 
 const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const suggestionsRef = useRef<HTMLDivElement | null>(null);
   const [openCheckIn, setOpenCheckIn] = useState<boolean>(false);
   const [openCheckOut, setOpenCheckOut] = useState<boolean>(false);
@@ -61,65 +61,47 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
   const positions = useSelector(
     (state: RootState) => state.position
   ) as Position[];
-  const t = useTranslations("Search");
-  const tValidation = useTranslations("ValidationErrors");
+  const t = useTranslations('Search');
+  const tValidation = useTranslations('ValidationErrors');
   const schemas = createSchemas(tValidation);
 
   const filteredPositions = useFilteredPositions({
     positions,
-    searchTerm: debouncedSearch,
+    searchTerm,
     maxResults: 10,
-    searchFields: ["tenViTri", "tinhThanh"],
+    searchFields: ['tenViTri', 'tinhThanh'],
   });
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target as Node)
-      ) {
-        setShowSuggestions(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useClickAway(suggestionsRef, () => setShowSuggestions(false));
 
   const form = useForm<SearchType>({
     resolver: zodResolver(schemas.searchSchema),
     defaultValues: {
-      location: "",
+      location: '',
       checkIn: undefined,
       checkOut: undefined,
       guests: 0,
     },
   });
 
-  const handleInputChange = useCallback((value: string) => {
+  const handleInputChange = (value: string) => {
     setSearchValue(value);
     setIsLoading(true);
-  }, []);
+  };
 
-  const handlePositionSelect = useCallback(
-    (position: Position) => {
-      form.setValue("location", position.tenViTri);
-      setShowSuggestions(false);
-    },
-    [form]
-  );
+  const handlePositionSelect = (position: Position) => {
+    form.setValue('location', position.tenViTri);
+    setShowSuggestions(false);
+  };
 
-  const handleClearInput = useCallback(() => {
-    form.setValue("location", "");
-    setSearchValue("");
-  }, [form]);
+  const handleClearInput = () => {
+    form.setValue('location', '');
+    setSearchValue('');
+  };
 
   useDebounce(
     () => {
-      setDebouncedSearch(normalizeText(searchValue));
+      setSearchTerm(normalizeText(searchValue));
       setIsLoading(false);
     },
     500,
@@ -141,11 +123,11 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
     );
 
     if (!selectedPosition || !selectedPosition.tinhThanh) {
-      showErrorToast(t("Search failed"));
+      showErrorToast(t('Search failed'));
       return;
     }
 
-    showSuccessToast(t("Searching"));
+    showSuccessToast(t('Searching'));
 
     const slug = slugify(selectedPosition.tinhThanh);
     router.push(`/rooms/${slug}`);
@@ -159,7 +141,7 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
           <form onSubmit={form.handleSubmit(onSubmitForm)}>
             <DialogHeader>
               <DialogTitle className="text-xl font-bold dark:text-white">
-                {t("Search accommodation")}
+                {t('Search accommodation')}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-6">
@@ -169,13 +151,13 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-white">
-                      {t("Location")}
+                      {t('Location')}
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <div className="relative">
                           <Input
-                            placeholder={t("Search location")}
+                            placeholder={t('Search location')}
                             {...field}
                             onClick={(
                               e: React.MouseEvent<HTMLInputElement>
@@ -189,8 +171,7 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                               handleInputChange(e.target.value);
                             }}
                             onBlur={() => {
-                              // Delay to allow clicking on suggestions
-                              setTimeout(() => setShowSuggestions(false), 200);
+                              setShowSuggestions(false);
                             }}
                             className="w-full rounded-xl border-gray-300 py-5 pl-10 text-base shadow-sm transition-all dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-300 placeholder:text-sm placeholder:text-gray-700"
                           />
@@ -222,7 +203,7 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                                 positions={positions}
                                 filteredPositions={filteredPositions}
                                 isLoading={isLoading}
-                                searchTerm={debouncedSearch}
+                                searchTerm={searchTerm}
                                 onSelect={handlePositionSelect}
                               />
                             </motion.div>
@@ -241,7 +222,7 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-white">
-                      {t("Check-in date")}
+                      {t('Check-in date')}
                     </FormLabel>
                     <FormControl>
                       <Popover open={openCheckIn} onOpenChange={setOpenCheckIn}>
@@ -252,10 +233,10 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                             aria-label="Select check-in date"
                           >
                             <CalendarIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-300" />
-                            <span className="ml-6 text-gray-700 dark:text-white">
+                            <span className="ml-6 text-gray-700 dark:text-gray-300">
                               {field.value
                                 ? formatDate(field.value)
-                                : t("Add date")}
+                                : t('Add date')}
                             </span>
                           </Button>
                         </PopoverTrigger>
@@ -278,22 +259,22 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                             initialFocus
                             classNames={{
                               caption:
-                                "flex justify-center items-center relative",
+                                'flex justify-center items-center relative',
                               caption_label:
-                                "text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default",
-                              nav: "flex items-center",
+                                'text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default',
+                              nav: 'flex items-center',
                               nav_button:
-                                "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer",
-                              nav_button_previous: "absolute left-2",
-                              nav_button_next: "absolute right-2",
+                                'w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer',
+                              nav_button_previous: 'absolute left-2',
+                              nav_button_next: 'absolute right-2',
                               head_cell:
-                                "text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2",
-                              row: "flex gap-1 mt-1",
-                              day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700",
+                                'text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2',
+                              row: 'flex gap-1 mt-1',
+                              day: 'w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700',
                               day_selected:
-                                "bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800",
+                                'bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800',
                               day_today:
-                                "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700",
+                                'border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700',
                             }}
                           />
                         </PopoverContent>
@@ -310,7 +291,7 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-white">
-                      {t("Check-out date")}
+                      {t('Check-out date')}
                     </FormLabel>
                     <FormControl>
                       <Popover
@@ -323,10 +304,10 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                             className="w-full cursor-pointer justify-start rounded-lg border-gray-300 py-5 pl-10 text-left hover:bg-gray-50 relative dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700"
                           >
                             <CalendarIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-300" />
-                            <span className="ml-6 text-gray-700 dark:text-white">
+                            <span className="ml-6 text-gray-700 dark:text-gray-300">
                               {field.value
                                 ? formatDate(field.value)
-                                : t("Add date")}
+                                : t('Add date')}
                             </span>
                           </Button>
                         </PopoverTrigger>
@@ -342,8 +323,8 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                               setOpenCheckOut(false);
                             }}
                             disabled={(date: Date) => {
-                              if (form.watch("checkIn"))
-                                return date <= form.watch("checkIn");
+                              if (form.watch('checkIn'))
+                                return date <= form.watch('checkIn');
                               return (
                                 date <=
                                 (field.value ||
@@ -353,22 +334,22 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                             initialFocus
                             classNames={{
                               caption:
-                                "flex justify-center items-center relative",
+                                'flex justify-center items-center relative',
                               caption_label:
-                                "text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default",
-                              nav: "flex items-center",
+                                'text-lg font-bold text-rose-500 dark:text-rose-400 cursor-default',
+                              nav: 'flex items-center',
                               nav_button:
-                                "w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer",
-                              nav_button_previous: "absolute left-2",
-                              nav_button_next: "absolute right-2",
+                                'w-6 h-6 rounded-full flex items-center justify-center bg-rose-500 text-white hover:bg-rose-700 dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer',
+                              nav_button_previous: 'absolute left-2',
+                              nav_button_next: 'absolute right-2',
                               head_cell:
-                                "text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2",
-                              row: "flex gap-1 mt-1",
-                              day: "w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700",
+                                'text-red-500 dark:text-rose-400 font-bold flex items-center justify-center w-full py-2',
+                              row: 'flex gap-1 mt-1',
+                              day: 'w-10 h-10 rounded-full text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700',
                               day_selected:
-                                "bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800",
+                                'bg-rose-600 text-white hover:bg-rose-600 hover:text-white dark:bg-rose-700 dark:hover:bg-rose-800',
                               day_today:
-                                "border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700",
+                                'border-rose-400 border-2 font-semibold bg-rose-50 text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-gray-800 dark:text-rose-400 dark:hover:bg-gray-700',
                             }}
                           />
                         </PopoverContent>
@@ -385,16 +366,16 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-white">
-                      {t("Number of guests")}
+                      {t('Number of guests')}
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
-                          placeholder={t("Add guests")}
+                          placeholder={t('Add guests')}
                           value={
                             field.value > 0
-                              ? `${field.value} ${t("Guests")}`
-                              : ""
+                              ? `${field.value} ${t('Guests')}`
+                              : ''
                           }
                           readOnly
                           className="w-full rounded-lg border-gray-300 py-5 pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-300 placeholder:text-sm placeholder:text-gray-700"
@@ -451,7 +432,7 @@ const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                 aria-label="Submit search form"
               >
                 <Search className="mr-2 h-5 w-5" />
-                {t("Search")}
+                {t('Search')}
               </Button>
             </div>
           </form>

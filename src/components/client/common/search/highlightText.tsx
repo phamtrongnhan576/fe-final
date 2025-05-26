@@ -1,10 +1,10 @@
-import { normalizeText } from "@/lib/utils";
-import { ReactNode } from "react";
+import { normalizeText } from '@/lib/utils';
+import { ReactNode } from 'react';
 
 export const highlightText = (
   text: string,
   query: string,
-  className: string = "bg-yellow-200 dark:bg-yellow-900"
+  className: string = 'bg-yellow-200 dark:bg-yellow-900'
 ): ReactNode => {
   const normalizedText = normalizeText(text);
 
@@ -12,7 +12,7 @@ export const highlightText = (
     return null;
   }
 
-  const regex = new RegExp(`(${query})`, "gi");
+  const regex = new RegExp(`(${query})`, 'gi');
   const parts = normalizedText.split(regex);
 
   let index = 0;
